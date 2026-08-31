@@ -45,7 +45,7 @@
 
             <div class="form-group">
                 <label class="form-label">Password</label>
-                <input type="password" name="password" class="input-box" placeholder="••••••••" required value="admin123456">
+                <input type="password" name="password" class="input-box" placeholder="••••••••" required value="12345678">
             </div>
 
             <button type="submit" class="btn-login"><i class="fas fa-lock"></i> Sign In to Admin Panel</button>
