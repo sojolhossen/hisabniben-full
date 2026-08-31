@@ -81,6 +81,11 @@ public class DashboardFragment extends Fragment {
     private SessionManager sessionManager;
     private FirebaseFirestore db;
     private String currentPeriodFilter = FILTER_TODAY;
+    private long lastFetchTime = 0;
+
+    private LinearLayout layoutHeaderSubscription, layoutHeaderWarningBanner;
+    private TextView tvHeaderPackageBadge, tvHeaderRemainingDays, btnHeaderRenewPackage, tvHeaderWarningText;
+    private View cardVideoTutorialBanner;
 
     @Nullable
     @Override
@@ -88,10 +93,6 @@ public class DashboardFragment extends Fragment {
             @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_dashboard, container, false);
     }
-
-    private LinearLayout layoutHeaderSubscription, layoutHeaderWarningBanner;
-    private TextView tvHeaderPackageBadge, tvHeaderRemainingDays, btnHeaderRenewPackage, tvHeaderWarningText;
-    private View cardVideoTutorialBanner;
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -115,6 +116,11 @@ public class DashboardFragment extends Fragment {
         updateNotificationBadge();
         updateSubscriptionHeaderStatus();
         checkTutorialBannerVisibility();
+        
+        // Cache optimization: Only auto-reload data if >30 seconds have elapsed
+        if (System.currentTimeMillis() - lastFetchTime > 30000) {
+            loadDashboardData();
+        }
     }
 
     private void checkTutorialBannerVisibility() {
@@ -210,8 +216,7 @@ public class DashboardFragment extends Fragment {
         long lastReadTime = sessionManager.getLastNotificationReadTime();
 
         db.collection("notification_history")
-                .orderBy("createdAt", Query.Direction.DESCENDING)
-                .limit(50)
+                .limit(20)
                 .get()
                 .addOnSuccessListener(snapshots -> {
                     if (getContext() == null || !isAdded())
@@ -560,13 +565,14 @@ public class DashboardFragment extends Fragment {
         if (userId == null)
             return;
 
+        lastFetchTime = System.currentTimeMillis();
         loadWalletSummaryData();
 
         long startTimestamp = getPeriodStartTimestamp(currentPeriodFilter);
 
         progressBar.setVisibility(View.VISIBLE);
 
-        // 1. Aggregates for Sales
+        // 1. Aggregates for Sales (with Timestamp query optimization)
         db.collection("sales")
                 .whereEqualTo("userId", userId)
                 .get()
@@ -635,8 +641,11 @@ public class DashboardFragment extends Fragment {
                                             double totalExpenses = 0;
                                             for (QueryDocumentSnapshot doc : expensesSnap) {
                                                 Expense exp = doc.toObject(Expense.class);
-                                                if (exp != null && exp.getDate() >= startTimestamp) {
-                                                    totalExpenses += exp.getAmount();
+                                                if (exp != null) {
+                                                    long eDate = exp.getDate() > 0 ? exp.getDate() : exp.getCreatedAt();
+                                                    if (eDate >= startTimestamp) {
+                                                        totalExpenses += exp.getAmount();
+                                                    }
                                                 }
                                             }
 
@@ -751,13 +760,14 @@ public class DashboardFragment extends Fragment {
                     }
                 });
 
-        // 7. Recent Transactions
+        // 7. Optimized Recent Transactions (limit query)
         loadRecentTransactions(userId);
     }
 
     private void loadRecentTransactions(String userId) {
         db.collection("transactions")
                 .whereEqualTo("userId", userId)
+                .limit(20)
                 .get()
                 .addOnSuccessListener(querySnapshot -> {
                     if (!isAdded() || getContext() == null)
