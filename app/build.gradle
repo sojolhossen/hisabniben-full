@@ -1,0 +1,80 @@
+plugins {
+    alias(libs.plugins.android.application)
+}
+
+apply plugin: 'com.google.gms.google-services'
+
+android {
+    namespace 'com.sajoldev.hisabniben'
+    compileSdk {
+        version = release(36) {
+            minorApiLevel = 1
+        }
+    }
+
+    defaultConfig {
+        applicationId "com.sajoldev.hisabniben"
+        minSdk 26
+        targetSdk 36
+        versionCode 23
+        versionName "2.2"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+}
+
+dependencies {
+    implementation libs.appcompat
+    implementation libs.material
+    implementation libs.activity
+    implementation libs.constraintlayout
+
+    // Firebase
+    implementation platform(libs.firebase.bom)
+    implementation libs.firebase.analytics
+    implementation libs.firebase.auth
+    implementation libs.firebase.firestore
+    implementation libs.firebase.messaging
+    implementation libs.firebase.functions
+
+    // OneSignal
+    implementation 'com.onesignal:OneSignal:5.1.0'
+
+    // Google Play Billing
+    implementation libs.billing
+
+    // Lifecycle
+    implementation libs.lifecycle.viewmodel
+    implementation libs.lifecycle.livedata
+    implementation libs.lifecycle.runtime
+
+    // Media3 & Browser
+    implementation libs.media3.exoplayer
+    implementation libs.media3.ui
+    implementation libs.media3.exoplayer.hls
+    implementation libs.browser
+
+    // UI Components
+    implementation libs.recyclerview
+    implementation libs.cardview
+    implementation libs.swiperefreshlayout
+    implementation libs.circleimageview
+    implementation libs.glide
+    implementation libs.mpchart
+    implementation 'androidx.viewpager2:viewpager2:1.0.0'
+
+    testImplementation libs.junit
+    androidTestImplementation libs.ext.junit
+    androidTestImplementation libs.espresso.core
+}

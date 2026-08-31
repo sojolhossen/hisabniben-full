@@ -1,0 +1,29 @@
+# Android / Java / Gradle
+*.iml
+.gradle/
+/local.properties
+/.idea/
+.DS_Store
+/build/
+app/build/
+/captures
+.externalNativeBuild
+.cxx
+
+# Laravel Admin Panel (hisab-admin)
+hisab-admin/vendor/
+hisab-admin/.env
+hisab-admin/.env.backup
+hisab-admin/.env.production
+hisab-admin/storage/*.key
+hisab-admin/storage/logs/*.log
+hisab-admin/storage/framework/cache/*
+hisab-admin/storage/framework/sessions/*
+hisab-admin/storage/framework/views/*
+hisab-admin/bootstrap/cache/*
+hisab-admin/public/storage
+hisab-admin/public/build
+hisab-admin/node_modules/
+
+# Firebase Functions
+functions/node_modules/

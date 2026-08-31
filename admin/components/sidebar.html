@@ -1,0 +1,93 @@
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <div class="logo-icon">
+            <i class="fas fa-calculator"></i>
+        </div>
+        <div>
+            <h3>HisabNiben</h3>
+            <span>Admin Panel</span>
+        </div>
+    </div>
+    
+    <nav class="sidebar-nav">
+        <span class="nav-section">Main</span>
+        
+        <a href="index.html" class="nav-link" data-page="dashboard">
+            <i class="fas fa-chart-line"></i>
+            <span>Dashboard</span>
+        </a>
+        
+        <span class="nav-section">Management</span>
+        
+        <a href="users.html" class="nav-link" data-page="users">
+            <i class="fas fa-users"></i>
+            <span>Users</span>
+        </a>
+
+        <a href="purchase-history.html" class="nav-link" data-page="purchase-history">
+            <i class="fas fa-receipt"></i>
+            <span>Purchase History</span>
+        </a>
+
+        <a href="packages.html" class="nav-link" data-page="packages">
+            <i class="fas fa-box"></i>
+            <span>Packages</span>
+        </a>
+        
+        <a href="sms-packages.html" class="nav-link" data-page="sms-packages">
+            <i class="fas fa-sms"></i>
+            <span>SMS Packages</span>
+        </a>
+        
+        <a href="sms-settings.html" class="nav-link" data-page="sms-settings">
+            <i class="fas fa-cog"></i>
+            <span>SMS API</span>
+        </a>
+
+        <a href="payment-requests.html" class="nav-link" data-page="payment-requests">
+            <i class="fas fa-money-bill-wave"></i>
+            <span>Payment Requests</span>
+        </a>
+
+        <a href="payment-methods.html" class="nav-link" data-page="payment-methods">
+            <i class="fas fa-credit-card"></i>
+            <span>Payment Methods</span>
+        </a>
+        
+        <span class="nav-section">Communication</span>
+        
+        <a href="notifications.html" class="nav-link" data-page="notifications">
+            <i class="fas fa-bell"></i>
+            <span>Notifications</span>
+        </a>
+
+        <span class="nav-section">Content</span>
+
+        <a href="tutorials.html" class="nav-link" data-page="tutorials">
+            <i class="fas fa-video"></i>
+            <span>Video Tutorials</span>
+        </a>
+        
+        <span class="nav-section">System</span>
+        
+        <a href="settings.html" class="nav-link" data-page="settings">
+            <i class="fas fa-cog"></i>
+            <span>Settings</span>
+        </a>
+    </nav>
+    
+    <div class="sidebar-footer">
+        <div class="admin-info">
+            <div class="admin-avatar" id="admin-avatar">A</div>
+            <div>
+                <div class="admin-name" id="admin-name">Admin</div>
+                <div class="admin-role">Administrator</div>
+            </div>
+        </div>
+        <button class="btn-logout" id="logout-btn" onclick="Auth.signOut().then(() => window.location.href = 'login.html')">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </button>
+    </div>
+</aside>
+
+<div class="sidebar-overlay" id="sidebar-overlay"></div>

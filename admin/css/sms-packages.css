@@ -1,0 +1,290 @@
+/* SMS Packages Management Center Styling */
+
+.kpi-command-grid-4 {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 16px !important;
+    margin-bottom: 24px !important;
+}
+
+@media (max-width: 1024px) {
+    .kpi-command-grid-4 {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .kpi-command-grid-4 {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+/* PERFORMANCE HIGHLIGHTS GRID */
+.perf-highlights-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+@media (max-width: 992px) {
+    .perf-highlights-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.perf-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-xl);
+    padding: 18px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.perf-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.perf-icon-wrap {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.perf-icon-wrap.best-value { background: rgba(16, 185, 129, 0.12); color: #10B981; }
+.perf-icon-wrap.cheapest { background: rgba(59, 130, 246, 0.12); color: #3B82F6; }
+.perf-icon-wrap.highest { background: rgba(245, 158, 11, 0.12); color: #F59E0B; }
+
+.perf-info h6 {
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--gray-500);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0 0 4px 0;
+}
+
+.perf-info .perf-title {
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--dark);
+    margin-bottom: 2px;
+}
+
+.perf-info .perf-sub {
+    font-size: 12px;
+    color: var(--gray-400);
+}
+
+/* SEARCH & FILTER BAR STYLING */
+.pkg-filter-bar {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+@media (max-width: 992px) {
+    .pkg-filter-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+
+.pkg-search-box {
+    position: relative;
+    flex: 1;
+    display: flex;
+    align-items: center;
+}
+
+.pkg-search-icon {
+    position: absolute;
+    left: 14px;
+    color: var(--gray-400);
+    font-size: 14px;
+    pointer-events: none;
+}
+
+.pkg-search-input {
+    width: 100% !important;
+    height: 44px !important;
+    padding: 10px 14px 10px 40px !important;
+    border: 1.5px solid var(--border-color) !important;
+    border-radius: var(--radius) !important;
+    font-size: 13.5px !important;
+    font-weight: 500 !important;
+    color: var(--dark) !important;
+    background: var(--bg-card) !important;
+    box-sizing: border-box !important;
+    transition: all 0.2s ease !important;
+}
+
+.pkg-search-input:focus {
+    border-color: var(--primary) !important;
+    outline: none !important;
+    box-shadow: 0 0 0 3px rgba(245, 73, 39, 0.12) !important;
+}
+
+.pkg-filter-dropdowns {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+@media (max-width: 768px) {
+    .pkg-filter-dropdowns {
+        flex-wrap: wrap;
+    }
+}
+
+.pkg-select-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.pkg-select-icon {
+    position: absolute;
+    left: 12px;
+    color: var(--gray-400);
+    font-size: 13px;
+    pointer-events: none;
+}
+
+.pkg-filter-select {
+    height: 44px !important;
+    padding: 8px 14px 8px 36px !important;
+    border: 1.5px solid var(--border-color) !important;
+    border-radius: var(--radius) !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    color: var(--dark) !important;
+    background: var(--bg-card) !important;
+    cursor: pointer !important;
+    box-sizing: border-box !important;
+    transition: all 0.2s ease !important;
+}
+
+.pkg-filter-select:focus {
+    border-color: var(--primary) !important;
+    outline: none !important;
+}
+
+/* TABLE COLUMN ALIGNMENT & SPACING OVERRIDES */
+#sms-packages-table th,
+#sms-packages-table td {
+    vertical-align: middle !important;
+    padding: 14px 16px !important;
+}
+
+#sms-packages-table th:nth-child(1), #sms-packages-table td:nth-child(1) { text-align: center !important; }
+#sms-packages-table th:nth-child(2), #sms-packages-table td:nth-child(2) { text-align: left !important; }
+#sms-packages-table th:nth-child(3), #sms-packages-table td:nth-child(3) { text-align: center !important; }
+#sms-packages-table th:nth-child(4), #sms-packages-table td:nth-child(4) { text-align: center !important; }
+#sms-packages-table th:nth-child(5), #sms-packages-table td:nth-child(5) { text-align: center !important; }
+#sms-packages-table th:nth-child(6), #sms-packages-table td:nth-child(6) { text-align: center !important; }
+#sms-packages-table th:nth-child(7), #sms-packages-table td:nth-child(7) { text-align: center !important; }
+#sms-packages-table th:nth-child(8), #sms-packages-table td:nth-child(8) { text-align: center !important; }
+
+/* LIVE PRICE PER SMS CALCULATOR BOX IN MODAL */
+.unit-cost-calc-box {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(59, 130, 246, 0.08) 100%);
+    border: 1px solid rgba(16, 185, 129, 0.25);
+    border-radius: var(--radius);
+    padding: 14px 18px;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.unit-cost-calc-box .cost-title {
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--gray-600);
+    text-transform: uppercase;
+}
+
+.unit-cost-calc-box .cost-val {
+    font-size: 22px;
+    font-weight: 900;
+    color: #10B981;
+}
+
+/* MODAL DIALOG OVERRIDES */
+#sms-package-modal .modal-dialog {
+    width: 100%;
+    max-width: 660px !important;
+}
+
+#sms-package-modal .modal-content {
+    max-width: 100% !important;
+}
+
+/* FORCE FULL WIDTH ON ALL SMS PACKAGE MODAL INPUTS */
+#sms-package-modal .form-input,
+#sms-package-modal select.form-input,
+#sms-package-modal textarea.form-input,
+#sms-package-modal input[type="text"],
+#sms-package-modal input[type="number"],
+#sms-package-modal select {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    display: block !important;
+    border: 1.5px solid var(--border-color);
+    border-radius: var(--radius);
+    padding: 10px 14px;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--dark);
+    background: var(--bg-card);
+    transition: all 0.2s ease;
+}
+
+#sms-package-modal .form-input:focus,
+#sms-package-modal select.form-input:focus,
+#sms-package-modal textarea.form-input:focus {
+    border-color: var(--primary) !important;
+    outline: none !important;
+    box-shadow: 0 0 0 3px rgba(245, 73, 39, 0.12) !important;
+}
+
+#sms-package-modal label {
+    display: block;
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--gray-600);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+}
+
+.sms-modal-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.sms-modal-group {
+    margin-bottom: 16px;
+    width: 100%;
+    box-sizing: border-box;
+}

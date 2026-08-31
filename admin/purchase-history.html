@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Purchase History & Revenue Center - HisabNiben Admin</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.0/dist/chart.umd.min.js"></script>
+
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/purchase-history.css">
+    <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+    <div class="admin-wrapper">
+        <div id="sidebar-container"></div>
+
+        <main class="main-content">
+            <div id="navbar-container"></div>
+
+            <div class="page-content users-page-bg">
+                
+                <!-- GLOBAL PAGE HEADER -->
+                <header class="dashboard-header-bar">
+                    <div class="header-greeting">
+                        <h2><i class="fas fa-receipt" style="color: var(--primary);"></i> Purchase History & Revenue Center</h2>
+                        <p id="sync-timestamp-subtitle">Monitor subscriptions, SMS purchases, payments and revenue. • Synced just now</p>
+                    </div>
+
+                    <div class="header-controls">
+                        <button class="btn btn-sm users-btn-outline" onclick="PurchaseHistoryModule.exportCSV()" title="Export CSV">
+                            <i class="fas fa-file-csv"></i> Export CSV
+                        </button>
+
+                        <button class="btn btn-sm users-btn-outline" onclick="PurchaseHistoryModule.refresh()" title="Reload Data">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
+                </header>
+
+                <!-- 6 KPI SUMMARY COMMAND CARDS -->
+                <section class="kpi-command-grid" aria-label="Purchase Summary">
+                    
+                    <!-- 1. TOTAL PURCHASES -->
+                    <article class="kpi-card" onclick="PurchaseHistoryModule.applyStatusFilter('all')">
+                        <div class="kpi-header">
+                            <div class="kpi-icon-badge users"><i class="fas fa-shopping-cart"></i></div>
+                            <div class="kpi-trend up"><i class="fas fa-database"></i> All</div>
+                        </div>
+                        <div class="kpi-value" id="total-purchases-count">0</div>
+                        <div class="kpi-label">Total Purchases Recorded</div>
+                    </article>
+
+                    <!-- 2. COMPLETED -->
+                    <article class="kpi-card" onclick="PurchaseHistoryModule.applyStatusFilter('completed')">
+                        <div class="kpi-header">
+                            <div class="kpi-icon-badge premium"><i class="fas fa-check-circle"></i></div>
+                            <div class="kpi-trend up"><i class="fas fa-check"></i> Approved</div>
+                        </div>
+                        <div class="kpi-value" id="completed-count">0</div>
+                        <div class="kpi-label">Completed & Verified</div>
+                    </article>
+
+                    <!-- 3. PENDING -->
+                    <article class="kpi-card" onclick="PurchaseHistoryModule.applyStatusFilter('pending')">
+                        <div class="kpi-header">
+                            <div class="kpi-icon-badge pending"><i class="fas fa-hourglass-half"></i></div>
+                            <div class="kpi-trend neutral">Review</div>
+                        </div>
+                        <div class="kpi-value" id="pending-count">0</div>
+                        <div class="kpi-label">Pending Payments</div>
+                    </article>
+
+                    <!-- 4. FAILED / CANCELLED -->
+                    <article class="kpi-card" onclick="PurchaseHistoryModule.applyStatusFilter('failed')">
+                        <div class="kpi-header">
+                            <div class="kpi-icon-badge expired"><i class="fas fa-ban"></i></div>
+                            <div class="kpi-trend down"><i class="fas fa-times"></i> Failed</div>
+                        </div>
+                        <div class="kpi-value" id="failed-count">0</div>
+                        <div class="kpi-label">Failed / Rejected</div>
+                    </article>
+
+                    <!-- 5. SUBSCRIPTION REVENUE -->
+                    <article class="kpi-card" onclick="PurchaseHistoryModule.applyTypeFilter('subscription')">
+                        <div class="kpi-header">
+                            <div class="kpi-icon-badge revenue"><i class="fas fa-crown"></i></div>
+                            <div class="kpi-trend up">Package</div>
+                        </div>
+                        <div class="kpi-value" id="sub-revenue-val">৳0</div>
+                        <div class="kpi-label">Subscription Revenue</div>
+                    </article>
+
+                    <!-- 6. SMS REVENUE -->
+                    <article class="kpi-card" onclick="PurchaseHistoryModule.applyTypeFilter('sms')">
+                        <div class="kpi-header">
+                            <div class="kpi-icon-badge sms"><i class="fas fa-comment-dots"></i></div>
+                            <div class="kpi-trend neutral">SMS</div>
+                        </div>
+                        <div class="kpi-value" id="sms-revenue-val">৳0</div>
+                        <div class="kpi-label">SMS Packages Revenue</div>
+                    </article>
+                </section>
+
+                <!-- REVENUE ANALYTICS SECTION -->
+                <section class="analytics-charts-grid">
+                    
+                    <!-- REVENUE TREND LINE CHART -->
+                    <article class="chart-card users-surface-card">
+                        <div class="chart-header users-card-header">
+                            <div class="users-card-header-text">
+                                <h5><i class="fas fa-chart-line"></i> Approved Revenue Trend</h5>
+                                <p class="chart-subtitle">Monthly approved revenue timeline across all channels</p>
+                            </div>
+                        </div>
+                        <div class="chart-body">
+                            <div class="chart-card-height">
+                                <canvas id="purchaseRevenueChart"></canvas>
+                            </div>
+                        </div>
+                    </article>
+
+                    <!-- PAYMENT METHOD DONUT CHART -->
+                    <article class="chart-card users-surface-card">
+                        <div class="chart-header users-card-header">
+                            <div class="users-card-header-text">
+                                <h5><i class="fas fa-chart-pie"></i> Payment Method Breakdown</h5>
+                                <p class="chart-subtitle">bKash, Nagad, Bank & Play Store</p>
+                            </div>
+                        </div>
+                        <div class="chart-body">
+                            <div class="chart-card-height">
+                                <canvas id="paymentMethodChart"></canvas>
+                            </div>
+                        </div>
+                    </article>
+                </section>
+
+                <!-- GLOBAL SEARCH & EXPANDABLE ADVANCED FILTER PANEL -->
+                <section class="chart-card users-surface-card users-filter-card" style="margin-bottom: 24px;">
+                    <div class="chart-header users-card-header">
+                        <div class="users-card-header-text">
+                            <h5><i class="fas fa-magnifying-glass"></i> Search & Filter Purchases</h5>
+                            <p class="chart-subtitle">Search by Purchase ID, User Name, Phone, Email, TxID, or Package Name</p>
+                        </div>
+                        <div class="chart-actions">
+                            <button type="button" class="btn btn-sm users-btn-outline" onclick="PurchaseHistoryModule.toggleAdvancedFilters()">
+                                <i class="fas fa-sliders"></i> <span id="btn-toggle-filters-text">Advanced Filters</span>
+                            </button>
+                            <button type="button" class="btn btn-sm users-btn-clear" onclick="PurchaseHistoryModule.resetFilters()">
+                                <i class="fas fa-times"></i> Reset
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="chart-body users-card-body-tight">
+                        <div class="search-filter-wrapper users-filter-row">
+                            <div class="search-container users-search-wide" style="flex: 1;">
+                                <i class="fas fa-search search-icon"></i>
+                                <input type="text" class="search-input" placeholder="Type to search Purchase ID, User Name, Phone, Email, TxID..." id="search-purchases" autocomplete="off">
+                            </div>
+                        </div>
+
+                        <!-- EXPANDABLE ADVANCED FILTERS CONTAINER -->
+                        <div id="advanced-filters-panel" style="display: none; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border-color);">
+                            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px;">
+                                <div>
+                                    <label style="font-size: 11px; font-weight: 700; color: var(--gray-500); text-transform: uppercase;">Status</label>
+                                    <select class="form-input" id="filter-status" onchange="PurchaseHistoryModule.applyFilters()">
+                                        <option value="all">All Statuses</option>
+                                        <option value="completed">Completed / Approved</option>
+                                        <option value="pending">Pending</option>
+                                        <option value="failed">Failed / Rejected</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label style="font-size: 11px; font-weight: 700; color: var(--gray-500); text-transform: uppercase;">Type</label>
+                                    <select class="form-input" id="filter-type" onchange="PurchaseHistoryModule.applyFilters()">
+                                        <option value="all">All Types</option>
+                                        <option value="subscription">Subscription Package</option>
+                                        <option value="sms">SMS Bundle</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label style="font-size: 11px; font-weight: 700; color: var(--gray-500); text-transform: uppercase;">Payment Method</label>
+                                    <select class="form-input" id="filter-method" onchange="PurchaseHistoryModule.applyFilters()">
+                                        <option value="all">All Methods</option>
+                                        <option value="bkash">bKash</option>
+                                        <option value="nagad">Nagad</option>
+                                        <option value="rocket">Rocket</option>
+                                        <option value="bank">Bank Transfer</option>
+                                        <option value="google_play">Google Play Billing</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label style="font-size: 11px; font-weight: 700; color: var(--gray-500); text-transform: uppercase;">Date Range</label>
+                                    <select class="form-input" id="filter-date" onchange="PurchaseHistoryModule.applyFilters()">
+                                        <option value="all">All Time</option>
+                                        <option value="today">Today</option>
+                                        <option value="7d">Last 7 Days</option>
+                                        <option value="30d">Last 30 Days</option>
+                                        <option value="this_month">This Month</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ACTIVE FILTER CHIPS -->
+                        <div id="active-filter-chips" style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px;"></div>
+                    </div>
+                </section>
+
+                <!-- DIRECTORY TABLE / GRID VIEW CONTAINER -->
+                <section class="chart-card users-surface-card users-table-card">
+                    <div class="chart-header users-card-header users-table-header">
+                        <div class="users-card-header-text">
+                            <h5><i class="fas fa-table"></i> Purchase Directory</h5>
+                            <p class="chart-subtitle" id="showing-count">Showing 0 purchases</p>
+                        </div>
+                        <div class="chart-actions">
+                            <button type="button" class="btn users-view-toggle" id="toggle-view" onclick="PurchaseHistoryModule.toggleView()">
+                                <i class="fas fa-th" id="view-toggle-icon"></i>
+                                <span id="view-toggle-text">Grid view</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- TABLE VIEW CONTAINER -->
+                    <div class="chart-body users-table-body" id="table-view-container">
+                        <div class="table-container users-table-scroll" style="overflow-x: auto;">
+                            <table id="purchases-table" class="data-table-modern users-data-table" style="width:100%">
+                                <thead>
+                                    <tr>
+                                        <th width="4%"><input type="checkbox" id="select-all-purchases" title="Select all"></th>
+                                        <th width="16%">Purchase ID / TxID</th>
+                                        <th width="18%">User</th>
+                                        <th width="16%">Package</th>
+                                        <th width="10%">Amount</th>
+                                        <th width="10%">Method</th>
+                                        <th width="10%">Date</th>
+                                        <th width="8%">Status</th>
+                                        <th width="8%">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="purchases-tbody">
+                                    <tr>
+                                        <td colspan="9" style="text-align: center; padding: 30px; color: var(--gray-400);">
+                                            <div class="spinner" style="margin: 0 auto 10px auto;"></div>
+                                            Loading purchase records...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- GRID CARD VIEW CONTAINER -->
+                    <div id="grid-view-container" style="display: none;" class="users-grid-container">
+                        <!-- Rendered by JS -->
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- RIGHT-SIDE 600px PURCHASE DETAIL DRAWER -->
+    <div class="purchase-drawer-overlay" id="purchase-drawer-overlay">
+        <div class="purchase-drawer-shell">
+            <div class="purchase-drawer-header">
+                <div>
+                    <h4 style="font-size: 18px; font-weight: 800; color: var(--dark);" id="drawer-purchase-id">Purchase Details</h4>
+                    <p style="font-size: 12px; color: var(--gray-500);" id="drawer-purchase-subtitle">Review complete payment & subscription breakdown</p>
+                </div>
+                <button type="button" class="modal-close" onclick="PurchaseHistoryModule.closeDrawer()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="purchase-drawer-body">
+                
+                <!-- VISUAL PAYMENT TIMELINE -->
+                <div class="payment-timeline" id="purchase-timeline">
+                    <div class="timeline-step completed">
+                        <div class="timeline-icon"><i class="fas fa-plus"></i></div>
+                        <div class="timeline-label">Created</div>
+                    </div>
+                    <div class="timeline-step completed">
+                        <div class="timeline-icon"><i class="fas fa-paper-plane"></i></div>
+                        <div class="timeline-label">Submitted</div>
+                    </div>
+                    <div class="timeline-step active" id="tl-step-verify">
+                        <div class="timeline-icon"><i class="fas fa-search"></i></div>
+                        <div class="timeline-label">Verified</div>
+                    </div>
+                    <div class="timeline-step" id="tl-step-active">
+                        <div class="timeline-icon"><i class="fas fa-check"></i></div>
+                        <div class="timeline-label">Activated</div>
+                    </div>
+                </div>
+
+                <!-- PURCHASE INFORMATION BLOCK -->
+                <div style="background: var(--gray-50); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 18px; margin-bottom: 16px;">
+                    <h6 style="font-size: 13px; font-weight: 700; color: var(--gray-600); margin-bottom: 12px;">PURCHASE INFORMATION</h6>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; font-size: 13px;">
+                        <div><span style="color: var(--gray-500);">Amount:</span> <strong id="dp-amount" style="color: var(--primary); font-size: 16px;">৳0</strong></div>
+                        <div><span style="color: var(--gray-500);">Status:</span> <span id="dp-status-badge" class="status-badge approved">APPROVED</span></div>
+                        <div><span style="color: var(--gray-500);">Payment Method:</span> <strong id="dp-method">-</strong></div>
+                        <div><span style="color: var(--gray-500);">Transaction ID:</span> <code id="dp-txid">-</code></div>
+                        <div><span style="color: var(--gray-500);">Purchase Date:</span> <strong id="dp-date">-</strong></div>
+                        <div><span style="color: var(--gray-500);">Package Duration:</span> <strong id="dp-duration">-</strong></div>
+                    </div>
+                </div>
+
+                <!-- USER INFORMATION BLOCK -->
+                <div style="background: var(--gray-50); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 18px; margin-bottom: 16px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                        <h6 style="font-size: 13px; font-weight: 700; color: var(--gray-600); margin: 0;">BUYER INFORMATION</h6>
+                        <a href="users.html" class="btn btn-sm users-btn-outline" style="font-size: 11px; padding: 2px 8px;"><i class="fas fa-external-link-alt"></i> CRM Profile</a>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; font-size: 13px;">
+                        <div><span style="color: var(--gray-500);">Full Name:</span> <strong id="dp-user-name">-</strong></div>
+                        <div><span style="color: var(--gray-500);">Phone:</span> <strong id="dp-user-phone">-</strong></div>
+                        <div><span style="color: var(--gray-500);">Email:</span> <strong id="dp-user-email">-</strong></div>
+                        <div><span style="color: var(--gray-500);">Shop Name:</span> <strong id="dp-user-store">-</strong></div>
+                    </div>
+                </div>
+
+                <!-- INLINE PAYMENT APPROVAL CONTROLS (FOR PENDING REQUESTS) -->
+                <div id="dp-approval-section" style="display: none; background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(239, 68, 68, 0.1) 100%); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: var(--radius); padding: 18px; margin-top: 20px;">
+                    <h6 style="font-size: 14px; font-weight: 800; color: var(--dark); margin-bottom: 8px;"><i class="fas fa-shield-halved" style="color: #F59E0B;"></i> Action Required: Verify Payment</h6>
+                    <p style="font-size: 12px; color: var(--gray-600); margin-bottom: 14px;">Confirming approval will safely extend user subscription or add SMS credits with 100% idempotency protection.</p>
+
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn btn-primary" onclick="PurchaseHistoryModule.approvePendingPayment()"><i class="fas fa-check-circle"></i> Approve Payment</button>
+                        <button class="btn btn-outline" onclick="PurchaseHistoryModule.rejectPendingPayment()" style="color: var(--danger); border-color: var(--danger);"><i class="fas fa-times-circle"></i> Reject Payment</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div id="loader-container"></div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <script src="config/config.js"></script>
+    <script src="js/firebase.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/purchase-history.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            await App.loadComponent('sidebar-container', 'components/sidebar.html');
+            await App.loadComponent('navbar-container', 'components/navbar.html');
+            await App.loadComponent('loader-container', 'components/loader.html');
+
+            const authenticated = await Auth.requireAuth();
+            if (!authenticated) return;
+
+            const profile = await Auth.getProfile();
+            if (profile) {
+                App.updateUserInfo(profile);
+            }
+
+            document.getElementById('page-title').textContent = 'Purchase History & Revenue Center';
+            await PurchaseHistoryModule.init();
+        });
+    </script>
+</body>
+</html>

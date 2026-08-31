@@ -1,0 +1,145 @@
+/* SMS Gateway & API Settings Center Styling */
+
+.kpi-command-grid-5 {
+    display: grid !important;
+    grid-template-columns: repeat(5, 1fr) !important;
+    gap: 16px !important;
+    margin-bottom: 24px !important;
+}
+
+@media (max-width: 1200px) {
+    .kpi-command-grid-5 {
+        grid-template-columns: repeat(3, 1fr) !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .kpi-command-grid-5 {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .kpi-command-grid-5 {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+/* REAL GATEWAY CONFIG CARD */
+.real-provider-card {
+    background: var(--bg-card);
+    border: 2px solid #10B981;
+    border-radius: var(--radius-xl);
+    padding: 24px;
+    box-shadow: 0 4px 20px rgba(16, 185, 129, 0.12);
+    margin-bottom: 24px;
+}
+
+.real-provider-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.real-provider-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.real-provider-title i {
+    font-size: 24px;
+    color: var(--primary);
+}
+
+.real-provider-title h5 {
+    font-size: 18px;
+    font-weight: 800;
+    margin: 0;
+    color: var(--dark);
+}
+
+/* MODAL DIALOG OVERRIDES FOR SMS SETTINGS */
+#sms-test-modal .modal-dialog {
+    width: 100%;
+    max-width: 620px !important;
+}
+
+#sms-test-modal .modal-content {
+    max-width: 100% !important;
+}
+
+/* FORCE FULL WIDTH ON ALL SMS SETTINGS INPUTS */
+.modern-form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.modern-form-group {
+    margin-bottom: 16px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.modern-form-group .form-input,
+.modern-form-group select.form-input,
+.modern-form-group textarea.form-input,
+.modern-form-row .form-input,
+.modern-form-row select {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    display: block !important;
+    border: 1.5px solid var(--border-color);
+    border-radius: var(--radius);
+    padding: 10px 14px;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--dark);
+    background: var(--bg-card);
+    transition: all 0.2s ease;
+}
+
+.modern-form-group .form-input:focus,
+.modern-form-row .form-input:focus {
+    border-color: var(--primary) !important;
+    outline: none !important;
+    box-shadow: 0 0 0 3px rgba(245, 73, 39, 0.12) !important;
+}
+
+.modern-form-group label,
+.modern-form-row label {
+    display: block;
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--gray-600);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+}
+
+/* STATUS DOT ANIMATION */
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 6px;
+}
+
+.status-dot.connected {
+    background-color: #10B981;
+    box-shadow: 0 0 8px #10B981;
+}
+
+.status-dot.disconnected {
+    background-color: #EF4444;
+    box-shadow: 0 0 8px #EF4444;
+}

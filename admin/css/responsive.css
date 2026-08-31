@@ -1,0 +1,823 @@
+/* Responsive Styles - Enhanced for Mobile */
+
+/* Tablet Landscape */
+@media (max-width: 1200px) {
+    .stats-grid { 
+        grid-template-columns: repeat(2, 1fr); 
+        gap: 16px;
+    }
+    
+    .charts-grid { 
+        grid-template-columns: 1fr; 
+        gap: 16px;
+    }
+    
+    .actions-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .revenue-section {
+        grid-template-columns: 1fr;
+    }
+    
+    .bottom-section {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Tablet Portrait */
+@media (max-width: 991.98px) {
+    .sidebar { 
+        transform: translateX(-100%); 
+        transition: transform 0.3s ease;
+    }
+    
+    .sidebar.show { 
+        transform: translateX(0); 
+    }
+    
+    .main-content { 
+        margin-left: 0; 
+    }
+    
+    .menu-toggle { 
+        display: flex; 
+    }
+    
+    .navbar-search { 
+        display: none; 
+    }
+    
+    .page-content { 
+        padding: 20px !important; 
+    }
+
+    .sidebar-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(4px);
+        z-index: 999;
+        display: none;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .sidebar-overlay.show { 
+        display: block;
+        opacity: 1;
+    }
+    
+    .welcome-banner {
+        padding: 24px;
+    }
+    
+    .welcome-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 16px;
+    }
+    
+    .welcome-text h1 {
+        font-size: 24px;
+    }
+    
+    .welcome-actions {
+        width: 100%;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    .welcome-actions .btn {
+        flex: 1;
+        min-width: 140px;
+    }
+}
+
+/* Mobile Landscape & Tablet */
+@media (max-width: 768px) {
+    .page-content { 
+        padding: 16px !important; 
+    }
+    
+    .stats-grid { 
+        grid-template-columns: 1fr; 
+        gap: 12px;
+    }
+    
+    .stat-card {
+        padding: 16px;
+    }
+    
+    .stat-value {
+        font-size: 28px;
+    }
+    
+    .stat-icon {
+        width: 44px;
+        height: 44px;
+        font-size: 18px;
+    }
+    
+    .stat-trend {
+        font-size: 11px;
+        padding: 4px 8px;
+    }
+    
+    .card-body { 
+        padding: 16px; 
+    }
+    
+    .page-header { 
+        flex-direction: column; 
+        gap: 12px; 
+    }
+    
+    .welcome-banner {
+        padding: 20px 16px;
+        margin-bottom: 16px;
+    }
+    
+    .welcome-text h1 {
+        font-size: 20px;
+    }
+    
+    .welcome-text p {
+        font-size: 13px;
+    }
+    
+    .welcome-actions {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .welcome-actions .btn {
+        width: 100%;
+        min-width: auto;
+    }
+    
+    .revenue-stats {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+    
+    .revenue-item {
+        padding: 14px;
+    }
+    
+    .revenue-icon {
+        width: 44px;
+        height: 44px;
+        font-size: 18px;
+    }
+    
+    .revenue-value {
+        font-size: 22px;
+    }
+    
+    .revenue-chart {
+        height: 180px;
+    }
+    
+    .activity-list {
+        max-height: 250px;
+    }
+    
+    .activity-item {
+        padding: 12px;
+        gap: 10px;
+    }
+    
+    .activity-icon {
+        width: 36px;
+        height: 36px;
+        font-size: 14px;
+    }
+    
+    .activity-title {
+        font-size: 13px;
+    }
+    
+    .activity-desc {
+        font-size: 12px;
+    }
+    
+    .chart-header {
+        padding: 14px 16px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .chart-header h5 {
+        font-size: 14px;
+    }
+    
+    .chart-actions {
+        width: 100%;
+    }
+    
+    .chart-actions .btn {
+        width: 100%;
+    }
+    
+    .chart-height {
+        height: 200px;
+    }
+    
+    .actions-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+        padding: 16px;
+    }
+    
+    .action-item {
+        padding: 14px 10px;
+    }
+    
+    .action-icon {
+        width: 44px;
+        height: 44px;
+        font-size: 16px;
+    }
+    
+    .action-label {
+        font-size: 11px;
+    }
+    
+    .status-grid {
+        grid-template-columns: 1fr;
+        gap: 8px;
+        padding: 12px;
+    }
+    
+    .status-item {
+        padding: 10px;
+    }
+    
+    .status-icon {
+        width: 36px;
+        height: 36px;
+        font-size: 14px;
+    }
+    
+    .status-label {
+        font-size: 12px;
+    }
+    
+    .status-value {
+        font-size: 13px;
+    }
+    
+    .subscription-legend {
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+    
+    .legend-item {
+        font-size: 12px;
+    }
+}
+
+/* Mobile Portrait */
+@media (max-width: 576px) {
+    .login-card { 
+        padding: 24px 16px; 
+    }
+    
+    .top-navbar { 
+        padding: 0 16px; 
+    }
+    
+    .page-content { 
+        padding: 12px !important; 
+    }
+    
+    .page-header h1 {
+        font-size: 20px;
+    }
+    
+    .page-header p {
+        font-size: 13px;
+    }
+    
+    .welcome-banner {
+        padding: 16px 12px;
+    }
+    
+    .welcome-text h1 {
+        font-size: 18px;
+    }
+    
+    .welcome-text p {
+        font-size: 12px;
+    }
+    
+    .stats-grid {
+        gap: 10px;
+    }
+    
+    .stat-card {
+        padding: 14px;
+    }
+    
+    .stat-header {
+        margin-bottom: 10px;
+    }
+    
+    .stat-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+    }
+    
+    .stat-value {
+        font-size: 24px;
+    }
+    
+    .stat-label {
+        font-size: 11px;
+    }
+    
+    .stat-trend {
+        font-size: 10px;
+        padding: 3px 6px;
+    }
+    
+    .revenue-section {
+        gap: 12px;
+    }
+    
+    .revenue-card .card-header {
+        padding: 12px 14px;
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .revenue-card .card-header h5 {
+        font-size: 13px;
+    }
+    
+    .period-selector {
+        width: 100%;
+        font-size: 13px;
+    }
+    
+    .revenue-stats {
+        padding: 0 14px;
+    }
+    
+    .revenue-item {
+        padding: 12px;
+        gap: 12px;
+    }
+    
+    .revenue-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+    }
+    
+    .revenue-value {
+        font-size: 20px;
+    }
+    
+    .revenue-label {
+        font-size: 11px;
+    }
+    
+    .revenue-chart {
+        height: 160px;
+        padding: 0 14px 14px;
+    }
+    
+    .activity-feed .card-header {
+        padding: 12px 14px;
+    }
+    
+    .activity-feed .card-header h5 {
+        font-size: 13px;
+    }
+    
+    .view-all {
+        font-size: 11px;
+    }
+    
+    .charts-grid {
+        gap: 12px;
+    }
+    
+    .chart-card {
+        margin-bottom: 0;
+    }
+    
+    .chart-header h5 {
+        font-size: 13px;
+    }
+    
+    .chart-subtitle {
+        font-size: 11px;
+    }
+    
+    .chart-body {
+        padding: 12px;
+    }
+    
+    .chart-height {
+        height: 180px;
+    }
+    
+    .bottom-section {
+        gap: 12px;
+    }
+    
+    .section-header {
+        padding: 12px 14px;
+    }
+    
+    .section-header h5 {
+        font-size: 13px;
+    }
+    
+    .quick-actions .actions-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+        padding: 12px;
+    }
+    
+    .action-item {
+        padding: 12px 8px;
+    }
+    
+    .action-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 14px;
+        margin-bottom: 6px;
+    }
+    
+    .action-label {
+        font-size: 10px;
+    }
+    
+    .status-grid {
+        padding: 10px;
+        gap: 6px;
+    }
+    
+    .status-item {
+        padding: 8px;
+        gap: 10px;
+    }
+    
+    .status-icon {
+        width: 32px;
+        height: 32px;
+        font-size: 13px;
+    }
+    
+    .status-label {
+        font-size: 11px;
+    }
+    
+    .status-value {
+        font-size: 12px;
+    }
+    
+    .navbar-right {
+        gap: 8px;
+    }
+    
+    .navbar-btn {
+        width: 36px;
+        height: 36px;
+    }
+    
+    .user-dropdown .user-name {
+        display: none;
+    }
+    
+    .user-dropdown .user-avatar {
+        width: 32px;
+        height: 32px;
+    }
+}
+
+/* Very Small Screens */
+@media (max-width: 400px) {
+    .welcome-text h1 {
+        font-size: 16px;
+    }
+    
+    .welcome-text p {
+        font-size: 11px;
+    }
+    
+    .stat-value {
+        font-size: 22px;
+    }
+    
+    .revenue-value {
+        font-size: 18px;
+    }
+    
+    .actions-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .action-icon {
+        width: 36px;
+        height: 36px;
+        font-size: 13px;
+    }
+    
+    .action-label {
+        font-size: 9px;
+    }
+}
+
+/* Print */
+@media print {
+    .sidebar, 
+    .top-navbar, 
+    .btn, 
+    .modal-overlay, 
+    .toast-container,
+    .welcome-decoration { 
+        display: none !important; 
+    }
+    
+    .main-content { 
+        margin-left: 0 !important; 
+    }
+    
+    .page-content { 
+        padding: 0 !important; 
+    }
+}
+
+/* Touch Devices Optimization */
+@media (hover: none) and (pointer: coarse) {
+    .btn {
+        min-height: 44px;
+        padding: 12px 16px;
+    }
+
+    .form-control {
+        min-height: 44px;
+        padding: 12px 14px;
+    }
+
+    .nav-link {
+        padding: 14px 20px;
+    }
+
+    .action-item {
+        min-height: 80px;
+    }
+
+    .stat-card {
+        min-height: 120px;
+    }
+
+    /* Improve tap targets */
+    a, button, input, select {
+        min-height: 44px;
+    }
+
+    /* Better scrolling on mobile */
+    .activity-list,
+    .chart-height {
+        -webkit-overflow-scrolling: touch;
+    }
+}
+
+/* Purchase History Page - Mobile Optimizations */
+@media (max-width: 768px) {
+    /* Stats grid - 2 columns on mobile */
+    .users-stats-grid.stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+
+    .users-stat-bento {
+        padding: 16px;
+    }
+
+    .stat-value {
+        font-size: 20px;
+    }
+
+    .stat-label {
+        font-size: 11px;
+    }
+
+    /* Filter section - stack elements */
+    .users-filter-row {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .users-search-wide {
+        width: 100%;
+    }
+
+    .users-filter-actions {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .users-select-wrap {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .users-filter-select {
+        width: 100%;
+    }
+
+    /* Table card adjustments */
+    .users-table-card .users-card-header {
+        flex-direction: column;
+        gap: 12px;
+        align-items: flex-start !important;
+    }
+
+    .users-table-header .users-card-header-text {
+        width: 100%;
+    }
+
+    .users-table-card .chart-actions {
+        width: 100%;
+    }
+
+    .users-view-toggle {
+        width: 100%;
+        justify-content: center;
+    }
+
+    /* Hide less important columns on mobile */
+    .users-data-table th:nth-child(2),
+    .users-data-table td:nth-child(2),
+    .users-data-table th:nth-child(7),
+    .users-data-table td:nth-child(7),
+    .users-data-table th:nth-child(8),
+    .users-data-table td:nth-child(8) {
+        display: none;
+    }
+
+    /* Show SMS column on mobile */
+    .users-data-table th:nth-child(5),
+    .users-data-table td:nth-child(5) {
+        display: table-cell;
+    }
+
+    /* Make table scrollable horizontally */
+    .users-table-scroll {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .users-data-table {
+        min-width: 600px;
+    }
+
+    /* Grid view - single column */
+    .users-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    /* Modal adjustments */
+    .users-modal-shell {
+        width: 95%;
+        max-width: none;
+        margin: 20px auto;
+    }
+
+    .users-modal-body {
+        padding: 16px;
+    }
+
+    .users-detail-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    /* Reduce padding */
+    .users-card-body-tight {
+        padding: 12px;
+    }
+
+    .users-card-header {
+        padding: 16px 12px 12px;
+    }
+}
+
+/* Mobile Portrait - Extra Small Screens */
+@media (max-width: 480px) {
+    /* Stats grid - single column */
+    .users-stats-grid.stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .users-stat-bento {
+        padding: 14px;
+    }
+
+    .stat-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+    }
+
+    .stat-value {
+        font-size: 18px;
+    }
+
+    .stat-label {
+        font-size: 10px;
+    }
+
+    /* Smaller fonts */
+    .users-card-header h5 {
+        font-size: 16px;
+    }
+
+    .chart-subtitle {
+        font-size: 11px;
+    }
+
+    /* Table cells - smaller text */
+    .users-data-table {
+        font-size: 12px;
+    }
+
+    .users-data-table th,
+    .users-data-table td {
+        padding: 8px 6px;
+    }
+
+    .user-cell-modern {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+    }
+
+    .user-avatar-modern {
+        width: 32px;
+        height: 32px;
+        font-size: 12px;
+    }
+
+    .user-name-modern {
+        font-size: 13px;
+    }
+
+    .user-email-modern {
+        font-size: 11px;
+    }
+
+    /* Action buttons - smaller on mobile */
+    .action-btn-modern {
+        width: 32px;
+        height: 32px;
+        font-size: 12px;
+    }
+
+    /* Status badges - smaller */
+    .status-badge-modern {
+        padding: 4px 8px;
+        font-size: 10px;
+    }
+
+    /* Filter select and button */
+    .users-btn-clear {
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+
+    /* Modal header */
+    .users-modal-header {
+        padding: 16px;
+    }
+
+    .users-modal-header h5 {
+        font-size: 16px;
+    }
+
+    /* Footer buttons */
+    .users-modal-footer {
+        flex-direction: column;
+        gap: 8px;
+        padding: 12px;
+    }
+
+    .users-modal-footer .btn {
+        width: 100%;
+    }
+}
+

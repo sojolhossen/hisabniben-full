@@ -1,0 +1,35 @@
+<header class="top-navbar">
+    <div class="navbar-left">
+        <button class="menu-toggle" id="menu-toggle">
+            <i class="fas fa-bars"></i>
+        </button>
+        <h1 class="page-title" id="page-title">Dashboard</h1>
+    </div>
+    
+    <div class="navbar-right">
+        <div class="navbar-search" onclick="DashboardModule && DashboardModule.toggleCommandPalette(true)" style="cursor: pointer;">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Search... (Ctrl + K)" id="global-search" readonly style="cursor: pointer;">
+            <kbd class="kbd-shortcut">Ctrl K</kbd>
+        </div>
+
+        <button class="navbar-btn theme-toggle-btn" id="theme-toggle-btn" title="Toggle Light/Dark Theme" onclick="DashboardModule.toggleTheme()">
+            <i class="fas fa-moon" id="theme-icon"></i>
+        </button>
+        
+        <button class="navbar-btn nav-notif-btn" title="Notifications" onclick="window.location.href='notifications.html'">
+            <i class="fas fa-bell"></i>
+            <span class="nav-badge-dot" id="nav-notif-badge" style="display: none;"></span>
+        </button>
+        
+        <button class="navbar-btn" title="Refresh Dashboard" onclick="DashboardModule ? DashboardModule.loadData() : location.reload()">
+            <i class="fas fa-sync-alt"></i>
+        </button>
+        
+        <div class="user-dropdown" id="user-dropdown">
+            <div class="admin-avatar" id="navbar-avatar" style="width: 38px; height: 38px; font-size: 14px;">A</div>
+            <span class="user-name" id="navbar-user-name">Admin</span>
+            <i class="fas fa-chevron-down" style="font-size: 12px; color: var(--gray-400);"></i>
+        </div>
+    </div>
+</header>

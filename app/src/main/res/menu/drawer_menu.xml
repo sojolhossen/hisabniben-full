@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:id="@+id/group_business">
+        <item
+            android:id="@+id/nav_drawer_dashboard"
+            android:icon="@drawable/ic_home"
+            android:title="ড্যাশবোর্ড (Dashboard)" />
+        <item
+            android:id="@+id/nav_drawer_sales"
+            android:icon="@drawable/ic_payment"
+            android:title="চাল বিক্রি (Sales)" />
+        <item
+            android:id="@+id/nav_drawer_purchases"
+            android:icon="@drawable/ic_product"
+            android:title="চাল ক্রয় (Purchases)" />
+        <item
+            android:id="@+id/nav_drawer_stock"
+            android:icon="@drawable/ic_stock"
+            android:title="চালের স্টক (Rice Stock)" />
+    </group>
+
+    <item android:title="হিসাব-নিকাশ (ACCOUNTING)">
+        <menu>
+            <item
+                android:id="@+id/nav_drawer_wallet"
+                android:icon="@drawable/ic_money"
+                android:title="💰 টাকা-পয়সা (Business Wallet)" />
+            <item
+                android:id="@+id/nav_drawer_history"
+                android:icon="@drawable/ic_history"
+                android:title="হিসাবের ইতিহাস (History)" />
+            <item
+                android:id="@+id/nav_drawer_money_receive"
+                android:icon="@drawable/ic_money"
+                android:title="টাকা জমা (Money Receive)" />
+            <item
+                android:id="@+id/nav_drawer_expenses"
+                android:icon="@drawable/ic_baki"
+                android:title="ব্যবসার খরচ (Expenses)" />
+            <item
+                android:id="@+id/nav_drawer_customers"
+                android:icon="@drawable/ic_person"
+                android:title="কাস্টমার তালিকা (Customers)" />
+            <item
+                android:id="@+id/nav_drawer_suppliers"
+                android:icon="@drawable/ic_store"
+                android:title="মহাজন/সাপ্লায়ার (Suppliers)" />
+        </menu>
+    </item>
+
+    <item android:title="রিপোর্ট ও বিশ্লেষণ (REPORTS)">
+        <menu>
+            <item
+                android:id="@+id/nav_drawer_reports"
+                android:icon="@drawable/ic_document"
+                android:title="ব্যবসায়িক রিপোর্ট (Reports)" />
+        </menu>
+    </item>
+
+    <item android:title="সহায়তা ও সেটিংস">
+        <menu>
+            <item
+                android:id="@+id/nav_drawer_tutorials"
+                android:icon="@drawable/ic_play"
+                android:title="🎥 ভিডিও টিউটোরিয়াল (Help Center)" />
+            <item
+                android:id="@+id/nav_drawer_sms"
+                android:icon="@drawable/ic_chat"
+                android:title="SMS সেন্টার (SMS)" />
+            <item
+                android:id="@+id/nav_drawer_subscription"
+                android:icon="@drawable/ic_star"
+                android:title="সাবস্ক্রিপশন ও প্যাকেজ (Subscription)" />
+            <item
+                android:id="@+id/nav_drawer_notifications"
+                android:icon="@drawable/ic_notification"
+                android:title="নোটিফিকেশন (Notifications)" />
+            <item
+                android:id="@+id/nav_drawer_settings"
+                android:icon="@drawable/ic_settings"
+                android:title="অ্যাপ সেটিংস (Settings)" />
+            <item
+                android:id="@+id/nav_drawer_logout"
+                android:icon="@drawable/ic_logout"
+                android:title="🚪 লগআউট (Log Out)" />
+        </menu>
+    </item>
+
+</menu>

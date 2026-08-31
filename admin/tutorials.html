@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Tutorials — HisabNiben Admin</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@600;700;800&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <style>
+        body { font-family: 'Hind Siliguri', 'Inter', sans-serif; }
+        .tutorial-card {
+            background: #0f172a;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+        .tutorial-card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(245,73,39,0.4);
+            box-shadow: 0 10px 25px -5px rgba(245,73,39,0.15);
+        }
+        .tutorial-thumb {
+            position: relative;
+            aspect-ratio: 16/9;
+            background: #020617;
+            overflow: hidden;
+        }
+        .tutorial-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .play-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0.85;
+            transition: opacity 0.2s;
+        }
+        .tutorial-card:hover .play-overlay {
+            opacity: 1;
+            background: rgba(0,0,0,0.2);
+        }
+        .play-btn-circle {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #f54927;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            box-shadow: 0 4px 15px rgba(245,73,39,0.5);
+        }
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(2,6,23,0.85);
+            backdrop-filter: blur(8px);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal-box {
+            background: #0f172a;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 650px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+        }
+        .category-tab {
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            background: #0f172a;
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #94a3b8;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+        .category-tab.active {
+            background: #f54927;
+            color: #fff;
+            border-color: #f54927;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-wrapper">
+        <div id="sidebar-container"></div>
+
+        <main class="main-content">
+            <div id="navbar-container"></div>
+
+            <div class="page-content">
+                <!-- Page Header -->
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 16px;">
+                    <div>
+                        <h2 style="font-size: 22px; font-weight: 800; color: #fff; margin-bottom: 4px;">
+                            🎥 ভিডিও টিউটোরিয়াল ম্যানেজমেন্ট (Help Center CMS)
+                        </h2>
+                        <p style="font-size: 13.5px; color: #94a3b8; margin: 0;">
+                            হিসাব নিবেন অ্যান্ড্রয়েড অ্যাপের ক্যাটাগরি অনুযায়ী ভিডিও গাইড যুক্ত ও কনফিগার করুন।
+                        </p>
+                    </div>
+                    <button onclick="openCreateModal()" style="background: linear-gradient(135deg, #f54927, #f97316); border: none; padding: 10px 20px; border-radius: 12px; font-weight: 600; color: #fff; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(245,73,39,0.3);">
+                        <i class="fas fa-plus"></i> নতুন টিউটোরিয়াল যুক্ত করুন
+                    </button>
+                </div>
+
+                <!-- Category Filter Tabs Bar -->
+                <div style="display: flex; gap: 10px; overflow-x: auto; padding-bottom: 12px; margin-bottom: 24px; scrollbar-width: none;">
+                    <button class="category-tab active" onclick="filterCategory('all', this)">সবগুলো (All)</button>
+                    <button class="category-tab" onclick="filterCategory('getting_started', this)">🚀 শুরু করুন</button>
+                    <button class="category-tab" onclick="filterCategory('sales', this)">🌾 চাল বিক্রি</button>
+                    <button class="category-tab" onclick="filterCategory('purchase', this)">🛒 চাল ক্রয়</button>
+                    <button class="category-tab" onclick="filterCategory('stock', this)">📦 স্টক / মজুদ</button>
+                    <button class="category-tab" onclick="filterCategory('customer', this)">👥 কাস্টমার</button>
+                    <button class="category-tab" onclick="filterCategory('supplier', this)">🏢 মহাজন</button>
+                    <button class="category-tab" onclick="filterCategory('wallet', this)">💼 ওয়ালেট / ক্যাশ</button>
+                    <button class="category-tab" onclick="filterCategory('expense', this)">💸 খরচ / ব্যয়</button>
+                    <button class="category-tab" onclick="filterCategory('reports', this)">📊 রিপোর্ট</button>
+                    <button class="category-tab" onclick="filterCategory('sms', this)">💬 SMS</button>
+                    <button class="category-tab" onclick="filterCategory('subscription', this)">💳 সাবস্ক্রিপশন / পেমেন্ট</button>
+                    <button class="category-tab" onclick="filterCategory('settings', this)">⚙️ সেটিংস</button>
+                    <button class="category-tab" onclick="filterCategory('other', this)">📌 অন্যান্য</button>
+                </div>
+
+                <!-- Tutorial Video Grid -->
+                <div id="tutorials-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;">
+                    <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #94a3b8;">
+                        <i class="fas fa-spinner fa-spin fa-2x"></i>
+                        <p style="margin-top: 12px;">টিউটোরিয়াল লোড হচ্ছে...</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Create/Edit Modal -->
+    <div class="modal-overlay" id="tutorial-modal">
+        <div class="modal-box">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 14px;">
+                <h3 id="modal-title" style="font-size: 18px; font-weight: 700; color: #fff;">নতুন ভিডিও টিউটোরিয়াল যুক্ত করুন</h3>
+                <button onclick="closeModal()" style="background: none; border: none; color: #94a3b8; font-size: 18px; cursor: pointer;"><i class="fas fa-times"></i></button>
+            </div>
+            <form id="tutorial-form" onsubmit="saveTutorial(event)">
+                <input type="hidden" id="edit-id">
+
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; font-size: 12.5px; font-weight: 600; uppercase; color: #cbd5e1; margin-bottom: 6px;">টিউটোরিয়াল ক্যাটাগরি (App Category)</label>
+                    <select id="input-category" required style="width: 100%; padding: 11px 14px; border-radius: 10px; background: #020617; border: 1px solid #1e293b; color: #fff; font-size: 14px;">
+                        <option value="getting_started">🚀 শুরু করুন (Getting Started)</option>
+                        <option value="sales">🌾 চাল বিক্রি (Sales)</option>
+                        <option value="purchase">🛒 চাল ক্রয় (Purchase)</option>
+                        <option value="stock">📦 স্টক / মজুদ (Stock)</option>
+                        <option value="customer">👥 কাস্টমার (Customer)</option>
+                        <option value="supplier">🏢 মহাজন (Supplier)</option>
+                        <option value="wallet">💼 ওয়ালেট / ক্যাশ (Wallet)</option>
+                        <option value="expense">💸 খরচ / ব্যয় (Expense)</option>
+                        <option value="reports">📊 রিপোর্ট (Reports)</option>
+                        <option value="sms">💬 SMS সেন্টার (SMS)</option>
+                        <option value="subscription">💳 সাবস্ক্রিপশন / পেমেন্ট (Subscription)</option>
+                        <option value="settings">⚙️ সেটিংস (Settings)</option>
+                        <option value="other">📌 অন্যান্য (Other)</option>
+                    </select>
+                </div>
+
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; font-size: 12.5px; font-weight: 600; uppercase; color: #cbd5e1; margin-bottom: 6px;">ভিডিও প্ল্যাটফর্ম (Video Type)</label>
+                    <select id="input-videotype" required style="width: 100%; padding: 11px 14px; border-radius: 10px; background: #020617; border: 1px solid #1e293b; color: #fff; font-size: 14px;">
+                        <option value="youtube">YouTube Video</option>
+                        <option value="facebook">Facebook Video</option>
+                        <option value="direct">Direct MP4 Link</option>
+                        <option value="external">External Link</option>
+                    </select>
+                </div>
+
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; font-size: 12.5px; font-weight: 600; uppercase; color: #cbd5e1; margin-bottom: 6px;">টিউটোরিয়াল শিরোনাম (Title)</label>
+                    <input type="text" id="input-title" required placeholder="উদাহরণ: কীভাবে নতুন খাতা বা বেচা-কেনা যুক্ত করবেন" style="width: 100%; padding: 11px 14px; border-radius: 10px; background: #020617; border: 1px solid #1e293b; color: #fff; font-size: 14px;">
+                </div>
+
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; font-size: 12.5px; font-weight: 600; uppercase; color: #cbd5e1; margin-bottom: 6px;">ভিডিও ইউআরএল (Video URL)</label>
+                    <input type="url" id="input-url" required placeholder="https://www.youtube.com/watch?v=..." style="width: 100%; padding: 11px 14px; border-radius: 10px; background: #020617; border: 1px solid #1e293b; color: #fff; font-size: 14px;" onchange="autoFetchThumbnail()">
+                </div>
+
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; font-size: 12.5px; font-weight: 600; uppercase; color: #cbd5e1; margin-bottom: 6px;">থাম্বনেইল ইমেজ ইউআরএল (Thumbnail URL)</label>
+                    <input type="url" id="input-thumbnail" placeholder="https://img.youtube.com/vi/.../hqdefault.jpg" style="width: 100%; padding: 11px 14px; border-radius: 10px; background: #020617; border: 1px solid #1e293b; color: #fff; font-size: 14px;">
+                </div>
+
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; font-size: 12.5px; font-weight: 600; uppercase; color: #cbd5e1; margin-bottom: 6px;">টিউটোরিয়ালের সংক্ষিপ্ত বিবরণ (Description)</label>
+                    <textarea id="input-description" rows="3" placeholder="এই টিউটোরিয়ালে কী কী শেখানো হয়েছে তার বিবরণ লিখুন..." style="width: 100%; padding: 11px 14px; border-radius: 10px; background: #020617; border: 1px solid #1e293b; color: #fff; font-size: 14px;"></textarea>
+                </div>
+
+                <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px;">
+                    <button type="button" onclick="closeModal()" style="padding: 11px 20px; border-radius: 10px; background: #1e293b; color: #cbd5e1; border: none; font-weight: 600; cursor: pointer;">বাতিল</button>
+                    <button type="submit" style="padding: 11px 24px; border-radius: 10px; background: #f54927; color: #fff; border: none; font-weight: 600; cursor: pointer; shadow: 0 4px 15px rgba(245,73,39,0.4);">সংরক্ষণ করুন (Save)</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="loader-container"></div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <script src="config/config.js"></script>
+    <script src="js/firebase.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/tutorials.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            await App.loadComponent('sidebar-container', 'components/sidebar.html');
+            await App.loadComponent('navbar-container', 'components/navbar.html');
+            await App.loadComponent('loader-container', 'components/loader.html');
+
+            const authenticated = await Auth.requireAuth();
+            if (!authenticated) return;
+
+            const profile = await Auth.getProfile();
+            if (profile && document.getElementById('admin-name')) {
+                document.getElementById('admin-name').textContent = profile.name || 'Admin';
+            }
+
+            if (document.getElementById('page-title')) {
+                document.getElementById('page-title').textContent = 'Video Tutorials';
+            }
+            initTutorialsPage();
+        });
+    </script>
+</body>
+</html>

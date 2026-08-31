@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "455453552762",
+    "project_id": "eduprep-9c5b3",
+    "storage_bucket": "eduprep-9c5b3.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:455453552762:android:974df8d4e59d7153948bc3",
+        "android_client_info": {
+          "package_name": "com.sajoldev.hisabniben"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCQMJnu1OdvtBSBaDnlnwRRME6cCx2PIKU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

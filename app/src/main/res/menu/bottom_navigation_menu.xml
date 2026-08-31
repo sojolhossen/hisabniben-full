@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/nav_home"
+        android:icon="@drawable/ic_home"
+        android:title="ড্যাশবোর্ড" />
+
+    <item
+        android:id="@+id/nav_customers"
+        android:icon="@drawable/ic_person"
+        android:title="কাস্টমার" />
+
+    <item
+        android:id="@+id/nav_stock"
+        android:icon="@drawable/ic_stock"
+        android:title="চাল স্টক" />
+
+    <item
+        android:id="@+id/nav_suppliers"
+        android:icon="@drawable/ic_store"
+        android:title="মহাজন" />
+
+    <item
+        android:id="@+id/nav_more"
+        android:icon="@drawable/ic_more_vert"
+        android:title="মেন্যু" />
+
+</menu>

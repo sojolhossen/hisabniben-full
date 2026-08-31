@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subscription & Package Management Center - HisabNiben Admin</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/packages.css">
+    <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+    <div class="admin-wrapper">
+        <div id="sidebar-container"></div>
+
+        <main class="main-content">
+            <div id="navbar-container"></div>
+
+            <div class="page-content users-page-bg">
+
+                <!-- GLOBAL PAGE HEADER -->
+                <header class="dashboard-header-bar">
+                    <div class="header-greeting">
+                        <h2><i class="fas fa-cubes" style="color: var(--primary);"></i> Subscription & Package Management Center</h2>
+                        <p id="sync-timestamp-subtitle">Control app subscription plans, SMS bundles, pricing, and live Firestore sync. • Synced just now</p>
+                    </div>
+
+                    <div class="header-controls">
+                        <button class="btn btn-sm users-btn-primary" onclick="PackagesModule.openAddModal()" title="Add New Package">
+                            <i class="fas fa-plus-circle"></i> Add Package
+                        </button>
+
+                        <button class="btn btn-sm users-btn-outline" onclick="PackagesModule.refresh()" title="Reload Data">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
+                </header>
+
+                <!-- 6 KPI SUMMARY COMMAND CARDS -->
+                <section class="kpi-command-grid" aria-label="Packages Summary">
+                    
+                    <!-- 1. TOTAL PACKAGES -->
+                    <article class="kpi-card" onclick="PackagesModule.applyTypeFilter('all')">
+                        <div class="kpi-header">
+                            <div class="kpi-icon-badge users"><i class="fas fa-boxes"></i></div>
+                            <div class="kpi-trend up"><i class="fas fa-layer-group"></i> All</div>
+                        </div>
+                        <div class="kpi-value" id="total-packages-count">0</div>
+                        <div class="kpi-label">Total Packages Configured</div>
+                    </article>
+
+                    <!-- 2. ACTIVE PACKAGES -->
+                    <article class="kpi-card" onclick="PackagesModule.applyStatusFilter('active')">
+                        <div class="kpi-header">
+                            <div class="kpi-icon-badge premium"><i class="fas fa-check-circle"></i></div>
+                            <div class="kpi-trend up"><i class="fas fa-play"></i> Active</div>
+                        </div>
+                        <div class="kpi-value" id="active-packages-count">0</div>
+                        <div class="kpi-label">Live App Packages</div>
+                    </article>
+
+                    <!-- 3. SUBSCRIPTION PACKAGES -->
+                    <article class="kpi-card" onclick="PackagesModule.applyTypeFilter('subscription')">
+                        <div class="kpi-header">
+                            <div class="kpi-icon-badge revenue"><i class="fas fa-crown"></i></div>
+                            <div class="kpi-trend up">Subscription</div>
+                        </div>
+                        <div class="kpi-value" id="subscription-count">0</div>
+                        <div class="kpi-label">Subscription Plans</div>
+                    </article>
+
+                    <!-- 4. SMS PACKAGES -->
+                    <article class="kpi-card" onclick="PackagesModule.applyTypeFilter('sms')">
+                        <div class="kpi-header">
+                            <div class="kpi-icon-badge sms"><i class="fas fa-comment-dots"></i></div>
+                            <div class="kpi-trend neutral">SMS</div>
+                        </div>
+                        <div class="kpi-value" id="sms-count">0</div>
+                        <div class="kpi-label">SMS Bundle Packages</div>
+                    </article>
+
+                    <!-- 5. FEATURED PACKAGES -->
+                    <article class="kpi-card" onclick="PackagesModule.applyStatusFilter('featured')">
+                        <div class="kpi-header">
+                            <div class="kpi-icon-badge pending"><i class="fas fa-star"></i></div>
+                            <div class="kpi-trend neutral">Popular</div>
+                        </div>
+                        <div class="kpi-value" id="featured-count">0</div>
+                        <div class="kpi-label">Featured / Popular Plans</div>
+                    </article>
+
+                    <!-- 6. TOTAL REVENUE -->
+                    <article class="kpi-card">
+                        <div class="kpi-header">
+                            <div class="kpi-icon-badge revenue"><i class="fas fa-bangladeshi-taka-sign"></i></div>
+                            <div class="kpi-trend up">Total Sales</div>
+                        </div>
+                        <div class="kpi-value" id="total-revenue-val">৳0</div>
+                        <div class="kpi-label">Total Package Revenue</div>
+                    </article>
+                </section>
+
+                <!-- GLOBAL SEARCH & FILTER PANEL -->
+                <section class="chart-card users-surface-card users-filter-card" style="margin-bottom: 24px;">
+                    <div class="chart-header users-card-header">
+                        <div class="users-card-header-text">
+                            <h5><i class="fas fa-magnifying-glass"></i> Search & Filter Packages</h5>
+                            <p class="chart-subtitle">Filter by package name, type, duration, Play Store product ID, or status</p>
+                        </div>
+                        <div class="chart-actions">
+                            <button type="button" class="btn btn-sm users-btn-clear" onclick="PackagesModule.resetFilters()">
+                                <i class="fas fa-times"></i> Reset Filters
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="chart-body users-card-body-tight">
+                        <div class="pkg-filter-bar">
+                            <!-- SEARCH INPUT BOX -->
+                            <div class="pkg-search-box">
+                                <i class="fas fa-search pkg-search-icon"></i>
+                                <input type="text" class="pkg-search-input" placeholder="Type package name, Play Store ID, description, price..." id="search-packages" autocomplete="off">
+                            </div>
+
+                            <!-- FILTER DROPDOWNS BAR -->
+                            <div class="pkg-filter-dropdowns">
+                                <div class="pkg-select-wrap">
+                                    <i class="fas fa-layer-group pkg-select-icon"></i>
+                                    <select class="pkg-filter-select" id="filter-type" onchange="PackagesModule.applyFilters()">
+                                        <option value="all">All Types</option>
+                                        <option value="subscription">Subscription Plan</option>
+                                        <option value="sms">SMS Package</option>
+                                    </select>
+                                </div>
+
+                                <div class="pkg-select-wrap">
+                                    <i class="fas fa-toggle-on pkg-select-icon"></i>
+                                    <select class="pkg-filter-select" id="filter-status" onchange="PackagesModule.applyFilters()">
+                                        <option value="all">All Statuses</option>
+                                        <option value="active">Active Only</option>
+                                        <option value="inactive">Inactive Only</option>
+                                    </select>
+                                </div>
+
+                                <div class="pkg-select-wrap">
+                                    <i class="fas fa-clock pkg-select-icon"></i>
+                                    <select class="pkg-filter-select" id="filter-duration" onchange="PackagesModule.applyFilters()">
+                                        <option value="all">All Durations</option>
+                                        <option value="30">30 Days</option>
+                                        <option value="60">60 Days</option>
+                                        <option value="90">90 Days</option>
+                                        <option value="180">180 Days</option>
+                                        <option value="365">365 Days</option>
+                                        <option value="lifetime">Life-Time</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="active-filter-chips" style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px;"></div>
+                    </div>
+                </section>
+
+                <!-- DIRECTORY TABLE / GRID VIEW CONTAINER -->
+                <section class="chart-card users-surface-card users-table-card">
+                    <div class="chart-header users-card-header users-table-header">
+                        <div class="users-card-header-text">
+                            <h5><i class="fas fa-table"></i> Configured Packages Directory</h5>
+                            <p class="chart-subtitle" id="showing-count">Showing 0 packages</p>
+                        </div>
+                        <div class="chart-actions">
+                            <button type="button" class="btn users-view-toggle" id="toggle-view" onclick="PackagesModule.toggleView()">
+                                <i class="fas fa-th" id="view-toggle-icon"></i>
+                                <span id="view-toggle-text">Grid view</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- TABLE VIEW CONTAINER -->
+                    <div class="chart-body users-table-body" id="table-view-container">
+                        <div class="table-container users-table-scroll" style="overflow-x: auto;">
+                            <table id="packages-table" class="data-table-modern users-data-table" style="width:100%">
+                                <thead>
+                                    <tr>
+                                        <th width="5%">#</th>
+                                        <th width="22%">Package Name</th>
+                                        <th width="12%">Price (৳)</th>
+                                        <th width="12%">Duration</th>
+                                        <th width="20%">Features</th>
+                                        <th width="12%">Play Store ID</th>
+                                        <th width="8%">Status</th>
+                                        <th width="9%">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="packages-tbody">
+                                    <tr>
+                                        <td colspan="8" style="text-align: center; padding: 30px; color: var(--gray-400);">
+                                            <div class="spinner" style="margin: 0 auto 10px auto;"></div>
+                                            Loading configured packages...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- GRID CARD VIEW CONTAINER -->
+                    <div id="grid-view-container" style="display: none;" class="users-grid-container">
+                        <!-- Rendered by JS -->
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- SPLIT-SCREEN ADD / EDIT PACKAGE MODAL WITH LIVE ANDROID APP PREVIEW -->
+    <div class="modal-overlay" id="package-modal">
+        <div class="modal-dialog modal-xl users-modal-shell">
+            <div class="modal-content users-modal-content">
+                <div class="modal-header users-modal-header">
+                    <h5 id="package-modal-title"><i class="fas fa-plus-circle"></i> Configure Subscription Package</h5>
+                    <button type="button" class="modal-close" onclick="PackagesModule.closeModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <div class="modal-body users-modal-body">
+                    <div class="package-modal-split">
+                        
+                        <!-- LEFT PANE: CONFIGURATION INPUTS -->
+                        <div class="config-pane">
+                            <form id="package-form" onsubmit="PackagesModule.savePackage(event)">
+                                <input type="hidden" id="package-id">
+
+                                <div class="config-form-row">
+                                    <div>
+                                        <label>Package Name *</label>
+                                        <input type="text" class="form-input" id="package-name" placeholder="e.g. Monthly Premium" required oninput="PackagesModule.updateLivePreview()">
+                                    </div>
+                                    <div>
+                                        <label>Package Type *</label>
+                                        <select class="form-input" id="package-type" onchange="PackagesModule.onPackageTypeChange(); PackagesModule.updateLivePreview()">
+                                            <option value="subscription">Subscription Plan</option>
+                                            <option value="sms">SMS Package</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="config-form-row">
+                                    <div>
+                                        <label>Selling Price (৳) *</label>
+                                        <input type="number" class="form-input" id="package-price" placeholder="500" required oninput="PackagesModule.updateLivePreview()">
+                                    </div>
+                                    <div>
+                                        <label>Original Price (৳)</label>
+                                        <input type="number" class="form-input" id="package-original-price" placeholder="700" oninput="PackagesModule.updateLivePreview()">
+                                    </div>
+                                </div>
+
+                                <div class="config-form-group">
+                                    <label>Duration (Days) *</label>
+                                    <input type="number" class="form-input" id="package-duration" placeholder="30" required oninput="PackagesModule.updateLivePreview()">
+                                    <div class="preset-btn-group">
+                                        <button type="button" class="preset-btn" onclick="PackagesModule.setDurationPreset(30)">30 Days</button>
+                                        <button type="button" class="preset-btn" onclick="PackagesModule.setDurationPreset(60)">60 Days</button>
+                                        <button type="button" class="preset-btn" onclick="PackagesModule.setDurationPreset(90)">90 Days</button>
+                                        <button type="button" class="preset-btn" onclick="PackagesModule.setDurationPreset(180)">180 Days</button>
+                                        <button type="button" class="preset-btn" onclick="PackagesModule.setDurationPreset(365)">365 Days</button>
+                                        <button type="button" class="preset-btn highlight" onclick="PackagesModule.setDurationPreset(999)">Life-Time</button>
+                                    </div>
+                                </div>
+
+                                <!-- SMS CREDITS FIELD (DYNAMIC) -->
+                                <div id="sms-credits-container" class="config-form-group" style="display: none;">
+                                    <label style="color: var(--primary);">SMS Credits Count *</label>
+                                    <input type="number" class="form-input" id="package-sms-credits" placeholder="e.g. 500" oninput="PackagesModule.updateLivePreview()">
+                                </div>
+
+                                <div class="config-form-row">
+                                    <div>
+                                        <label>Play Store Product ID</label>
+                                        <input type="text" class="form-input" id="package-product-id" placeholder="hisabniben_premium_monthly">
+                                    </div>
+                                    <div>
+                                        <label>Badge Text (e.g. Popular)</label>
+                                        <input type="text" class="form-input" id="package-badge" placeholder="BEST VALUE" oninput="PackagesModule.updateLivePreview()">
+                                    </div>
+                                </div>
+
+                                <div class="config-form-group">
+                                    <label>Package Description</label>
+                                    <textarea class="form-input" id="package-description" rows="2" placeholder="Brief summary of package benefits..."></textarea>
+                                </div>
+
+                                <div class="config-form-group">
+                                    <label>Features Checklist</label>
+                                    <div class="features-checklist-grid" id="features-container">
+                                        <label class="feature-check-item"><input type="checkbox" name="features" value="Unlimited Customers" checked onchange="PackagesModule.updateLivePreview()"> Unlimited Customers</label>
+                                        <label class="feature-check-item"><input type="checkbox" name="features" value="Unlimited Transactions" checked onchange="PackagesModule.updateLivePreview()"> Unlimited Transactions</label>
+                                        <label class="feature-check-item"><input type="checkbox" name="features" value="Reports & Analytics" checked onchange="PackagesModule.updateLivePreview()"> Reports & Analytics</label>
+                                        <label class="feature-check-item"><input type="checkbox" name="features" value="Cloud Backup" checked onchange="PackagesModule.updateLivePreview()"> Cloud Backup</label>
+                                        <label class="feature-check-item"><input type="checkbox" name="features" value="Priority Support" checked onchange="PackagesModule.updateLivePreview()"> Priority Support</label>
+                                        <label class="feature-check-item"><input type="checkbox" name="features" value="Ad Free" checked onchange="PackagesModule.updateLivePreview()"> Ad Free</label>
+                                    </div>
+                                </div>
+
+                                <div class="config-form-row">
+                                    <div>
+                                        <label>Sort Order</label>
+                                        <input type="number" class="form-input" id="package-sort" value="1">
+                                    </div>
+                                    <div>
+                                        <label>Status</label>
+                                        <select class="form-input" id="package-status">
+                                            <option value="active">Active (Live in App)</option>
+                                            <option value="inactive">Inactive (Hidden)</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border-color);">
+                                    <button type="button" class="btn btn-outline" onclick="PackagesModule.closeModal()">Cancel</button>
+                                    <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save Package</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- RIGHT PANE: LIVE ANDROID APP CARD PREVIEW -->
+                        <div class="preview-pane">
+                            <h6 style="font-size: 12px; font-weight: 800; color: var(--gray-500); text-transform: uppercase; margin-bottom: 16px;">
+                                <i class="fab fa-android" style="color: #10B981;"></i> Android App Live Preview
+                            </h6>
+
+                            <div class="android-sub-card">
+                                <div class="android-sub-badge" id="preview-badge">BEST VALUE</div>
+                                <div class="android-sub-title" id="preview-name">Monthly Premium</div>
+                                <div class="android-sub-duration" id="preview-duration">30 Days Access</div>
+                                <div class="android-sub-price-wrap">
+                                    <span class="android-sub-price" id="preview-price">৳500</span>
+                                    <span class="android-sub-original-price" id="preview-original">৳700</span>
+                                    <div><span class="android-sub-discount-tag" id="preview-discount">SAVE 28%</span></div>
+                                </div>
+                                <div class="android-sub-features" id="preview-features-list">
+                                    <div class="android-sub-feature-item"><i class="fas fa-check-circle"></i> Unlimited Customers</div>
+                                    <div class="android-sub-feature-item"><i class="fas fa-check-circle"></i> Unlimited Transactions</div>
+                                    <div class="android-sub-feature-item"><i class="fas fa-check-circle"></i> Reports & Analytics</div>
+                                </div>
+                                <button type="button" class="android-sub-btn">SUBSCRIBE NOW</button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="loader-container"></div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <script src="config/config.js"></script>
+    <script src="js/firebase.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/packages.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            await App.loadComponent('sidebar-container', 'components/sidebar.html');
+            await App.loadComponent('navbar-container', 'components/navbar.html');
+            await App.loadComponent('loader-container', 'components/loader.html');
+
+            const authenticated = await Auth.requireAuth();
+            if (!authenticated) return;
+
+            const profile = await Auth.getProfile();
+            if (profile) {
+                App.updateUserInfo(profile);
+            }
+
+            document.getElementById('page-title').textContent = 'Subscription & Package Management Center';
+            await PackagesModule.init();
+        });
+    </script>
+</body>
+</html>

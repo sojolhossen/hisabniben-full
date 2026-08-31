@@ -1,0 +1,393 @@
+/* Packages Management Center Styling */
+
+.kpi-command-grid {
+    display: grid !important;
+    grid-template-columns: repeat(6, 1fr) !important;
+    gap: 16px !important;
+    margin-bottom: 24px !important;
+}
+
+@media (max-width: 1400px) {
+    .kpi-command-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .kpi-command-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .kpi-command-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+/* SEARCH & FILTER BAR STYLING */
+.pkg-filter-bar {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+@media (max-width: 992px) {
+    .pkg-filter-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+
+.pkg-search-box {
+    position: relative;
+    flex: 1;
+    display: flex;
+    align-items: center;
+}
+
+.pkg-search-icon {
+    position: absolute;
+    left: 14px;
+    color: var(--gray-400);
+    font-size: 14px;
+    pointer-events: none;
+}
+
+.pkg-search-input {
+    width: 100% !important;
+    height: 44px !important;
+    padding: 10px 14px 10px 40px !important;
+    border: 1.5px solid var(--border-color) !important;
+    border-radius: var(--radius) !important;
+    font-size: 13.5px !important;
+    font-weight: 500 !important;
+    color: var(--dark) !important;
+    background: var(--bg-card) !important;
+    box-sizing: border-box !important;
+    transition: all 0.2s ease !important;
+}
+
+.pkg-search-input:focus {
+    border-color: var(--primary) !important;
+    outline: none !important;
+    box-shadow: 0 0 0 3px rgba(245, 73, 39, 0.12) !important;
+}
+
+.pkg-filter-dropdowns {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+@media (max-width: 768px) {
+    .pkg-filter-dropdowns {
+        flex-wrap: wrap;
+    }
+}
+
+.pkg-select-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.pkg-select-icon {
+    position: absolute;
+    left: 12px;
+    color: var(--gray-400);
+    font-size: 13px;
+    pointer-events: none;
+}
+
+.pkg-filter-select {
+    height: 44px !important;
+    padding: 8px 14px 8px 36px !important;
+    border: 1.5px solid var(--border-color) !important;
+    border-radius: var(--radius) !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    color: var(--dark) !important;
+    background: var(--bg-card) !important;
+    cursor: pointer !important;
+    box-sizing: border-box !important;
+    transition: all 0.2s ease !important;
+}
+
+.pkg-filter-select:focus {
+    border-color: var(--primary) !important;
+    outline: none !important;
+}
+
+/* MODAL DIALOG WIDTH OVERRIDES */
+.modal-dialog {
+    width: 100%;
+    max-width: 600px;
+}
+
+.modal-dialog.modal-lg {
+    max-width: 800px;
+}
+
+.modal-dialog.modal-xl {
+    max-width: 1020px !important;
+    width: 95% !important;
+}
+
+/* SPLIT SCREEN PACKAGE MODAL LAYOUT */
+.package-modal-split {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 28px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+@media (max-width: 992px) {
+    .package-modal-split {
+        grid-template-columns: 1fr;
+    }
+}
+
+.config-pane {
+    max-height: 72vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 12px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* FORCE FULL WIDTH ON ALL CONFIG INPUTS */
+.config-pane .form-input,
+.config-pane select.form-input,
+.config-pane textarea.form-input,
+.config-pane input[type="text"],
+.config-pane input[type="number"],
+.config-pane select {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    display: block !important;
+    border: 1.5px solid var(--border-color);
+    border-radius: var(--radius);
+    padding: 10px 14px;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--dark);
+    background: var(--bg-card);
+    transition: all 0.2s ease;
+}
+
+.config-pane .form-input:focus,
+.config-pane select.form-input:focus,
+.config-pane textarea.form-input:focus {
+    border-color: var(--primary) !important;
+    outline: none !important;
+    box-shadow: 0 0 0 3px rgba(245, 73, 39, 0.12) !important;
+}
+
+.config-pane label {
+    display: block;
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--gray-600);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+}
+
+.config-form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.config-form-group {
+    margin-bottom: 16px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* PRESET BUTTONS STYLING */
+.preset-btn-group {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 6px;
+}
+
+.preset-btn {
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 11.5px;
+    font-weight: 700;
+    background: var(--gray-100);
+    color: var(--gray-700);
+    border: 1px solid var(--border-color);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.preset-btn:hover {
+    background: var(--primary-light);
+    color: var(--primary);
+    border-color: var(--primary);
+}
+
+.preset-btn.highlight {
+    color: var(--primary);
+    border-color: var(--primary);
+    background: var(--primary-light);
+}
+
+/* FEATURES CHECKLIST STYLING */
+.features-checklist-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    background: var(--gray-50);
+    padding: 14px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border-color);
+}
+
+.feature-check-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--dark);
+    cursor: pointer;
+}
+
+.feature-check-item input[type="checkbox"] {
+    width: 16px !important;
+    height: 16px !important;
+    accent-color: var(--primary);
+    cursor: pointer;
+}
+
+/* PREVIEW PANE STYLING */
+.preview-pane {
+    background: linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-xl);
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* LIVE ANDROID APP SUBSCRIPTION CARD PREVIEW */
+.android-sub-card {
+    width: 100%;
+    max-width: 320px;
+    background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
+    border-radius: 20px;
+    padding: 24px;
+    color: white;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+    position: relative;
+    overflow: hidden;
+    border: 2px solid rgba(245, 73, 39, 0.4);
+    text-align: center;
+}
+
+.android-sub-badge {
+    position: absolute;
+    top: 14px;
+    right: -32px;
+    background: linear-gradient(135deg, #F54927 0%, #EF4444 100%);
+    color: white;
+    font-size: 10px;
+    font-weight: 800;
+    padding: 4px 36px;
+    transform: rotate(45deg);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.android-sub-title {
+    font-size: 18px;
+    font-weight: 800;
+    margin-bottom: 4px;
+    color: #F8FAFC;
+    letter-spacing: -0.3px;
+}
+
+.android-sub-duration {
+    font-size: 12px;
+    color: #94A3B8;
+    margin-bottom: 16px;
+}
+
+.android-sub-price-wrap {
+    margin-bottom: 20px;
+}
+
+.android-sub-price {
+    font-size: 32px;
+    font-weight: 900;
+    color: #F54927;
+}
+
+.android-sub-original-price {
+    font-size: 14px;
+    color: #64748B;
+    text-decoration: line-through;
+    margin-left: 6px;
+}
+
+.android-sub-discount-tag {
+    display: inline-block;
+    background: rgba(16, 185, 129, 0.2);
+    color: #10B981;
+    font-size: 11px;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 12px;
+    margin-top: 4px;
+}
+
+.android-sub-features {
+    text-align: left;
+    margin-bottom: 24px;
+}
+
+.android-sub-feature-item {
+    font-size: 12px;
+    color: #CBD5E1;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.android-sub-feature-item i {
+    color: #10B981;
+    font-size: 13px;
+}
+
+.android-sub-btn {
+    width: 100%;
+    background: linear-gradient(135deg, #F54927 0%, #FF6B4A 100%);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 12px;
+    font-size: 14px;
+    font-weight: 800;
+    box-shadow: 0 4px 15px rgba(245, 73, 39, 0.4);
+    cursor: default;
+}

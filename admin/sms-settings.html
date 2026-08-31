@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SMS Gateway & API Settings - HisabNiben Admin</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/sms-settings.css">
+    <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+    <div class="admin-wrapper">
+        <div id="sidebar-container"></div>
+
+        <main class="main-content">
+            <div id="navbar-container"></div>
+
+            <div class="page-content users-page-bg">
+
+                <!-- GLOBAL PAGE HEADER -->
+                <header class="dashboard-header-bar">
+                    <div class="header-greeting">
+                        <h2>
+                            <i class="fas fa-server" style="color: var(--primary);"></i> SMS Gateway & API Settings
+                            <span class="badge" style="background:rgba(16,185,129,0.12); color:#10B981; font-size:12px; font-weight:800; padding:4px 12px; border-radius:12px; margin-left:10px;" id="gateway-status-badge">
+                                <span class="status-dot connected"></span> CONNECTED
+                            </span>
+                        </h2>
+                        <p id="sync-timestamp-subtitle">Configure BulkSMSBD API Key, Sender ID, Default Free SMS, and monitor real SMS dispatch history. • Synced just now</p>
+                    </div>
+
+                    <div class="header-controls">
+                        <button class="btn btn-sm users-btn-outline" onclick="SmsSettingsModule.testConnection()" title="Test Connection">
+                            <i class="fas fa-plug"></i> Test Gateway
+                        </button>
+
+                        <button class="btn btn-sm users-btn-primary" onclick="SmsSettingsModule.openTestSmsModal()" title="Send Test SMS">
+                            <i class="fas fa-paper-plane"></i> Send Test SMS
+                        </button>
+
+                        <button class="btn btn-sm users-btn-outline" onclick="SmsSettingsModule.refresh()" title="Reload Data">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
+                </header>
+
+                <!-- 5 REAL KPI SUMMARY CARDS -->
+                <section class="kpi-command-grid-5" aria-label="SMS Gateway Summary">
+                    
+                    <!-- 1. GATEWAY STATUS -->
+                    <article class="kpi-card">
+                        <div class="kpi-header">
+                            <div class="kpi-icon-badge users"><i class="fas fa-signal"></i></div>
+                            <div class="kpi-trend up" id="kpi-status-trend"><i class="fas fa-check"></i> Online</div>
+                        </div>
+                        <div class="kpi-value" id="kpi-gateway-status">CONNECTED</div>
+                        <div class="kpi-label">API Gateway Status</div>
+                    </article>
+
+                    <!-- 2. SENDER ID -->
+                    <article class="kpi-card">
+                        <div class="kpi-header">
+                            <div class="kpi-icon-badge premium"><i class="fas fa-user-tag"></i></div>
+                            <div class="kpi-trend up">Configured</div>
+                        </div>
+                        <div class="kpi-value" id="kpi-sender-id" style="font-size: 17px; word-break: break-all;">Not Set</div>
+                        <div class="kpi-label">Primary Sender ID</div>
+                    </article>
+
+                    <!-- 3. DEFAULT FREE SMS -->
+                    <article class="kpi-card">
+                        <div class="kpi-header">
+                            <div class="kpi-icon-badge revenue"><i class="fas fa-gift"></i></div>
+                            <div class="kpi-trend up">New Users</div>
+                        </div>
+                        <div class="kpi-value" id="kpi-default-sms">10 SMS</div>
+                        <div class="kpi-label">Default Free SMS Limit</div>
+                    </article>
+
+                    <!-- 4. TOTAL REAL SMS SENT ALL-TIME -->
+                    <article class="kpi-card">
+                        <div class="kpi-header">
+                            <div class="kpi-icon-badge sms"><i class="fas fa-paper-plane"></i></div>
+                            <div class="kpi-trend neutral">All-Time</div>
+                        </div>
+                        <div class="kpi-value" id="kpi-real-sms-total">0</div>
+                        <div class="kpi-label">Total Real SMS Sent</div>
+                    </article>
+
+                    <!-- 5. REAL SMS SENT TODAY -->
+                    <article class="kpi-card">
+                        <div class="kpi-header">
+                            <div class="kpi-icon-badge sms"><i class="fas fa-calendar-day"></i></div>
+                            <div class="kpi-trend neutral">Today</div>
+                        </div>
+                        <div class="kpi-value" id="kpi-real-sms-today">0</div>
+                        <div class="kpi-label">Real SMS Sent Today</div>
+                    </article>
+                </section>
+
+                <!-- REAL API CREDENTIALS & NEW USER FREE SMS CARD -->
+                <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 24px; margin-bottom: 24px;">
+                    
+                    <!-- LEFT CARD: PRIMARY API CREDENTIALS FORM -->
+                    <section class="chart-card users-surface-card">
+                        <div class="chart-header users-card-header">
+                            <div class="users-card-header-text">
+                                <h5><i class="fas fa-key"></i> Primary Gateway Credentials (`settings/sms_api`)</h5>
+                                <p class="chart-subtitle">Production credentials used by Android mobile app and backend SMS dispatches</p>
+                            </div>
+                        </div>
+
+                        <div class="chart-body users-card-body-tight">
+                            <form id="sms-api-form" onsubmit="SmsSettingsModule.saveSettings(event)">
+                                
+                                <div class="modern-form-group">
+                                    <label>API Key *</label>
+                                    <div style="position: relative; display: flex; align-items: center;">
+                                        <input type="password" class="form-input" id="api-key" placeholder="Enter SMS Gateway API Key..." required style="padding-right: 80px;">
+                                        <button type="button" class="btn btn-sm users-btn-outline" id="btn-toggle-mask" onclick="SmsSettingsModule.toggleMaskApiKey()" style="position: absolute; right: 6px; padding: 4px 10px; font-size: 11px;">Show</button>
+                                    </div>
+                                    <small style="font-size: 11px; color: var(--gray-400); margin-top: 4px; display: block;">Used for BulkSMSBD / Gateway API requests. Never expose in console logs.</small>
+                                </div>
+
+                                <div class="modern-form-row">
+                                    <div>
+                                        <label>Sender ID / Number *</label>
+                                        <input type="text" class="form-input" id="sender-id" placeholder="e.g. 8809648907415" required>
+                                    </div>
+                                    <div>
+                                        <label>Gateway Base API URL</label>
+                                        <input type="text" class="form-input" id="api-url" value="http://bulksmsbd.net/api/smsapi" placeholder="http://bulksmsbd.net/api/smsapi">
+                                    </div>
+                                </div>
+
+                                <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border-color);">
+                                    <button type="button" class="btn btn-outline" onclick="SmsSettingsModule.resetForm()"><i class="fas fa-undo"></i> Reset Unsaved</button>
+                                    <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save Changes</button>
+                                </div>
+                            </form>
+                        </div>
+                    </section>
+
+                    <!-- RIGHT CARD: NEW USER FREE SMS CONFIG -->
+                    <section class="chart-card users-surface-card">
+                        <div class="chart-header users-card-header">
+                            <div class="users-card-header-text">
+                                <h5><i class="fas fa-gift"></i> New User Free SMS</h5>
+                                <p class="chart-subtitle">Initial SMS credit rules for newly registered rice business accounts</p>
+                            </div>
+                        </div>
+
+                        <div class="chart-body users-card-body-tight">
+                            <div class="modern-form-group">
+                                <label>Default Free SMS Count *</label>
+                                <input type="number" class="form-input" id="default-sms-limit" value="10" min="0" placeholder="10">
+                                <div style="display: flex; gap: 6px; margin-top: 8px;">
+                                    <button type="button" class="btn btn-sm users-btn-outline" style="padding: 2px 8px; font-size: 11px;" onclick="document.getElementById('default-sms-limit').value = 0">0 SMS</button>
+                                    <button type="button" class="btn btn-sm users-btn-outline" style="padding: 2px 8px; font-size: 11px;" onclick="document.getElementById('default-sms-limit').value = 5">5 SMS</button>
+                                    <button type="button" class="btn btn-sm users-btn-outline" style="padding: 2px 8px; font-size: 11px;" onclick="document.getElementById('default-sms-limit').value = 10">10 SMS</button>
+                                    <button type="button" class="btn btn-sm users-btn-outline" style="padding: 2px 8px; font-size: 11px;" onclick="document.getElementById('default-sms-limit').value = 20">20 SMS</button>
+                                    <button type="button" class="btn btn-sm users-btn-outline" style="padding: 2px 8px; font-size: 11px;" onclick="document.getElementById('default-sms-limit').value = 50">50 SMS</button>
+                                </div>
+                                <div class="badge" style="background:#FEF3C7; color:#92400E; padding:10px 12px; border-radius:8px; font-size:11.5px; margin-top:16px; white-space:normal; text-align:left; line-height:1.5;">
+                                    <i class="fas fa-exclamation-triangle"></i> <strong>Important Note:</strong> Applies to newly registered users only. Changing this value will NOT modify existing users' SMS balances.
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                </div>
+
+                <!-- REAL FIRESTORE SMS HISTORY LOGS TABLE -->
+                <section class="chart-card users-surface-card users-table-card">
+                    <div class="chart-header users-card-header users-table-header">
+                        <div class="users-card-header-text">
+                            <h5><i class="fas fa-list-alt"></i> Real SMS Dispatch Logs (`sms_history`)</h5>
+                            <p class="chart-subtitle" id="showing-logs-count">Loading SMS history from Firestore...</p>
+                        </div>
+                    </div>
+
+                    <div class="chart-body users-table-body">
+                        <div class="table-container users-table-scroll" style="overflow-x: auto;">
+                            <table id="gateway-logs-table" class="data-table-modern users-data-table" style="width:100%">
+                                <thead>
+                                    <tr>
+                                        <th width="5%">#</th>
+                                        <th width="18%">Timestamp</th>
+                                        <th width="16%">Recipient Phone</th>
+                                        <th width="20%">Sender / Store Name</th>
+                                        <th width="26%">SMS Message Content</th>
+                                        <th width="15%">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="gateway-logs-tbody">
+                                    <tr>
+                                        <td colspan="6" style="text-align: center; padding: 30px; color: var(--gray-400);">
+                                            <div class="spinner" style="margin: 0 auto 10px auto;"></div>
+                                            Loading SMS history records...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- SEND TEST SMS MODAL WITH LIVE CHAR COUNTER -->
+    <div class="modal-overlay" id="sms-test-modal">
+        <div class="modal-dialog users-modal-shell">
+            <div class="modal-content users-modal-content">
+                <div class="modal-header users-modal-header">
+                    <h5><i class="fas fa-paper-plane"></i> Send Test SMS</h5>
+                    <button type="button" class="modal-close" onclick="SmsSettingsModule.closeTestSmsModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <form id="sms-test-form" onsubmit="SmsSettingsModule.sendTestSms(event)">
+                    <div class="modal-body users-modal-body" style="padding: 20px;">
+                        
+                        <div class="modern-form-group">
+                            <label>Test Recipient Phone Number *</label>
+                            <input type="text" class="form-input" id="test-phone" placeholder="e.g. 01700000000" required>
+                        </div>
+
+                        <div class="modern-form-group">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                                <label style="margin-bottom: 0;">Test SMS Content *</label>
+                                <span style="font-size: 11px; font-weight: 700; color: var(--gray-500);" id="test-char-counter">0 / 160 chars (1 SMS)</span>
+                            </div>
+                            <textarea class="form-input" id="test-message" rows="3" placeholder="Type test message text..." required oninput="SmsSettingsModule.updateTestCharCounter()"></textarea>
+                        </div>
+
+                        <div class="modal-footer users-modal-footer" style="padding-left: 0; padding-right: 0;">
+                            <button type="button" class="btn btn-outline" onclick="SmsSettingsModule.closeTestSmsModal()">Cancel</button>
+                            <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i> Send Test Message</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="loader-container"></div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <script src="config/config.js"></script>
+    <script src="js/firebase.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/sms-settings.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            await App.loadComponent('sidebar-container', 'components/sidebar.html');
+            await App.loadComponent('navbar-container', 'components/navbar.html');
+            await App.loadComponent('loader-container', 'components/loader.html');
+
+            const authenticated = await Auth.requireAuth();
+            if (!authenticated) return;
+
+            const profile = await Auth.getProfile();
+            if (profile) {
+                App.updateUserInfo(profile);
+            }
+
+            document.getElementById('page-title').textContent = 'SMS Gateway & API Settings';
+            await SmsSettingsModule.init();
+        });
+    </script>
+</body>
+</html>

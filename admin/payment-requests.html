@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Requests & Verification Center - HisabNiben Admin</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/payment-requests.css">
+    <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+    <div class="admin-wrapper">
+        <div id="sidebar-container"></div>
+
+        <main class="main-content">
+            <div id="navbar-container"></div>
+
+            <div class="page-content users-page-bg">
+
+                <!-- GLOBAL PAGE HEADER -->
+                <header class="dashboard-header-bar">
+                    <div class="header-greeting">
+                        <h2>
+                            <i class="fas fa-money-bill-wave" style="color: var(--primary);"></i> Payment Requests
+                            <span class="badge" style="background:rgba(16,185,129,0.12); color:#10B981; font-size:12px; font-weight:800; padding:4px 12px; border-radius:12px; margin-left:10px;">
+                                <span class="status-dot connected"></span> Operational
+                            </span>
+                        </h2>
+                        <p id="sync-timestamp-subtitle">Review, verify and manage manual bKash, Nagad, Rocket & Bank payment requests. • Synced just now</p>
+                    </div>
+
+                    <div class="header-controls">
+                        <button class="btn btn-sm users-btn-outline" onclick="PaymentRequestsModule.exportCSV()" title="Export CSV">
+                            <i class="fas fa-file-csv"></i> Export CSV
+                        </button>
+
+                        <a href="payment-methods.html" class="btn btn-sm users-btn-outline" title="Payment Methods">
+                            <i class="fas fa-wallet"></i> Payment Methods
+                        </a>
+
+                        <button class="btn btn-sm users-btn-outline" onclick="PaymentRequestsModule.refresh()" title="Reload Data">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
+                </header>
+
+                <!-- 8 BENTO KPI SUMMARY CARDS -->
+                <section class="kpi-command-grid-8" aria-label="Payment Summary">
+                    
+                    <!-- 1. TOTAL REQUESTS -->
+                    <article class="kpi-card" onclick="PaymentRequestsModule.applyStatusFilter('all')">
+                        <div class="kpi-header">
+                            <div class="kpi-icon-badge users"><i class="fas fa-file-invoice-dollar"></i></div>
+                            <div class="kpi-trend up"><i class="fas fa-layer-group"></i> All</div>
+                        </div>
+                        <div class="kpi-value" id="total-requests-count">0</div>
+                        <div class="kpi-label">Total Requests</div>
+                    </article>
+
+                    <!-- 2. PENDING VERIFICATION -->
+                    <article class="kpi-card" onclick="PaymentRequestsModule.applyStatusFilter('pending')" style="border-top:3px solid #F59E0B;">
+                        <div class="kpi-header">
+                            <div class="kpi-icon-badge pending"><i class="fas fa-clock"></i></div>
+                            <div class="kpi-trend down"><i class="fas fa-exclamation-triangle"></i> Urgent</div>
+                        </div>
+                        <div class="kpi-value" id="pending-requests-count" style="color: #F59E0B;">0</div>
+                        <div class="kpi-label">Pending Verification</div>
+                    </article>
+
+                    <!-- 3. APPROVED -->
+                    <article class="kpi-card" onclick="PaymentRequestsModule.applyStatusFilter('approved')">
+                        <div class="kpi-header">
+                            <div class="kpi-icon-badge premium"><i class="fas fa-check-circle"></i></div>
+                            <div class="kpi-trend up"><i class="fas fa-check"></i> Approved</div>
+                        </div>
+                        <div class="kpi-value" id="approved-requests-count">0</div>
+                        <div class="kpi-label">Approved Requests</div>
+                    </article>
+
+                    <!-- 4. REJECTED -->
+                    <article class="kpi-card" onclick="PaymentRequestsModule.applyStatusFilter('rejected')">
+                        <div class="kpi-header">
+                            <div class="kpi-icon-badge expired"><i class="fas fa-times-circle"></i></div>
+                            <div class="kpi-trend down">Rejected</div>
+                        </div>
+                        <div class="kpi-value" id="rejected-requests-count">0</div>
+                        <div class="kpi-label">Rejected Requests</div>
+                    </article>
+
+                    <!-- 5. TOTAL APPROVED REVENUE -->
+                    <article class="kpi-card">
+                        <div class="kpi-header">
+                            <div class="kpi-icon-badge revenue"><i class="fas fa-bangladeshi-taka-sign"></i></div>
+                            <div class="kpi-trend up">Approved</div>
+                        </div>
+                        <div class="kpi-value" id="approved-revenue-val">৳0</div>
+                        <div class="kpi-label">Total Approved Revenue</div>
+                    </article>
+
+                    <!-- 6. PENDING REVENUE -->
+                    <article class="kpi-card">
+                        <div class="kpi-header">
+                            <div class="kpi-icon-badge pending"><i class="fas fa-hourglass-half"></i></div>
+                            <div class="kpi-trend neutral">Pending</div>
+                        </div>
+                        <div class="kpi-value" id="pending-revenue-val" style="color: #F59E0B;">৳0</div>
+                        <div class="kpi-label">Pending Volume</div>
+                    </article>
+
+                    <!-- 7. TODAY'S REVENUE -->
+                    <article class="kpi-card">
+                        <div class="kpi-header">
+                            <div class="kpi-icon-badge revenue"><i class="fas fa-calendar-day"></i></div>
+                            <div class="kpi-trend up">Today</div>
+                        </div>
+                        <div class="kpi-value" id="today-revenue-val">৳0</div>
+                        <div class="kpi-label">Today's Approved Revenue</div>
+                    </article>
+
+                    <!-- 8. THIS MONTH REVENUE -->
+                    <article class="kpi-card">
+                        <div class="kpi-header">
+                            <div class="kpi-icon-badge revenue"><i class="fas fa-chart-line"></i></div>
+                            <div class="kpi-trend up">Month</div>
+                        </div>
+                        <div class="kpi-value" id="month-revenue-val">৳0</div>
+                        <div class="kpi-label">Monthly Approved Revenue</div>
+                    </article>
+                </section>
+
+                <!-- URGENT PAYMENT ALERT BANNER -->
+                <section class="urgent-payment-alert" id="urgent-payment-alert-box" style="display: none;">
+                    <div class="urgent-alert-text">
+                        <i class="fas fa-bell"></i>
+                        <div>
+                            <h6 id="urgent-alert-title">Pending Payment Verification Required</h6>
+                            <p id="urgent-alert-desc">There are manual payment requests waiting for super admin review.</p>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-sm users-btn-primary" onclick="PaymentRequestsModule.applyStatusFilter('pending')">
+                        Review Pending Payments
+                    </button>
+                </section>
+
+                <!-- GLOBAL SEARCH & FILTER PANEL -->
+                <section class="chart-card users-surface-card users-filter-card" style="margin-bottom: 24px;">
+                    <div class="chart-header users-card-header">
+                        <div class="users-card-header-text">
+                            <h5><i class="fas fa-magnifying-glass"></i> Search & Filter Payment Requests</h5>
+                            <p class="chart-subtitle">Filter by user name, phone, transaction ID (TrxID), package, or payment method</p>
+                        </div>
+                        <div class="chart-actions">
+                            <button type="button" class="btn btn-sm users-btn-clear" onclick="PaymentRequestsModule.resetFilters()">
+                                <i class="fas fa-times"></i> Reset Filters
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="chart-body users-card-body-tight">
+                        <div class="pkg-filter-bar">
+                            <!-- SEARCH INPUT BOX -->
+                            <div class="pkg-search-box">
+                                <i class="fas fa-search pkg-search-icon"></i>
+                                <input type="text" class="pkg-search-input" placeholder="Type user name, phone, transaction ID (TrxID), package..." id="search-payments" autocomplete="off">
+                            </div>
+
+                            <!-- FILTER DROPDOWNS BAR -->
+                            <div class="pkg-filter-dropdowns">
+                                <div class="pkg-select-wrap">
+                                    <i class="fas fa-toggle-on pkg-select-icon"></i>
+                                    <select class="pkg-filter-select" id="filter-status" onchange="PaymentRequestsModule.applyFilters()">
+                                        <option value="all">All Statuses</option>
+                                        <option value="pending">⏳ Pending</option>
+                                        <option value="approved">✅ Approved</option>
+                                        <option value="rejected">❌ Rejected</option>
+                                        <option value="on_hold">⏸️ On Hold</option>
+                                    </select>
+                                </div>
+
+                                <div class="pkg-select-wrap">
+                                    <i class="fas fa-wallet pkg-select-icon"></i>
+                                    <select class="pkg-filter-select" id="filter-method" onchange="PaymentRequestsModule.applyFilters()">
+                                        <option value="all">All Methods</option>
+                                        <option value="bkash">bKash</option>
+                                        <option value="nagad">Nagad</option>
+                                        <option value="rocket">Rocket</option>
+                                        <option value="bank">Bank Transfer</option>
+                                    </select>
+                                </div>
+
+                                <div class="pkg-select-wrap">
+                                    <i class="fas fa-cubes pkg-select-icon"></i>
+                                    <select class="pkg-filter-select" id="filter-type" onchange="PaymentRequestsModule.applyFilters()">
+                                        <option value="all">All Types</option>
+                                        <option value="subscription">Subscription</option>
+                                        <option value="sms">SMS Package</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="active-filter-chips" style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px;"></div>
+                    </div>
+                </section>
+
+                <!-- DIRECTORY TABLE CONTAINER -->
+                <section class="chart-card users-surface-card users-table-card">
+                    <div class="chart-header users-card-header users-table-header">
+                        <div class="users-card-header-text">
+                            <h5><i class="fas fa-table"></i> Payment Requests Directory</h5>
+                            <p class="chart-subtitle" id="showing-count">Showing 0 requests</p>
+                        </div>
+                    </div>
+
+                    <!-- TABLE VIEW CONTAINER -->
+                    <div class="chart-body users-table-body">
+                        <div class="table-container users-table-scroll" style="overflow-x: auto;">
+                            <table id="payment-requests-table" class="data-table-modern users-data-table" style="width:100%">
+                                <thead>
+                                    <tr>
+                                        <th width="4%">#</th>
+                                        <th width="22%">User Details</th>
+                                        <th width="16%">Package & Type</th>
+                                        <th width="12%">Amount (৳)</th>
+                                        <th width="14%">Payment Method</th>
+                                        <th width="16%">Transaction ID (TrxID)</th>
+                                        <th width="8%">Status</th>
+                                        <th width="8%">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="payment-requests-tbody">
+                                    <tr>
+                                        <td colspan="8" style="text-align: center; padding: 30px; color: var(--gray-400);">
+                                            <div class="spinner" style="margin: 0 auto 10px auto;"></div>
+                                            Loading payment requests...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- 600PX RIGHT-SIDE PAYMENT DETAIL DRAWER -->
+    <div class="drawer-backdrop" id="drawer-backdrop" onclick="PaymentRequestsModule.closeDrawer()"></div>
+    <div class="payment-drawer" id="payment-drawer">
+        <div class="drawer-header">
+            <div>
+                <h5 id="drawer-request-id">Request Details</h5>
+                <div style="font-size: 11px; color: var(--gray-400);" id="drawer-submitted-time">Submitted just now</div>
+            </div>
+            <button type="button" class="drawer-close" onclick="PaymentRequestsModule.closeDrawer()"><i class="fas fa-times"></i></button>
+        </div>
+
+        <div class="drawer-body" id="drawer-content-body">
+            <!-- Rendered by JS -->
+        </div>
+
+        <div class="drawer-footer" id="drawer-footer-actions">
+            <!-- Rendered by JS -->
+        </div>
+    </div>
+
+    <div id="loader-container"></div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <script src="config/config.js"></script>
+    <script src="js/firebase.js"></script>
+    <script src="js/utils.js?v=1.0.2"></script>
+    <script src="js/main.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/payment-requests.js?v=1.0.3"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            await App.loadComponent('sidebar-container', 'components/sidebar.html');
+            await App.loadComponent('navbar-container', 'components/navbar.html');
+            await App.loadComponent('loader-container', 'components/loader.html');
+
+            const authenticated = await Auth.requireAuth();
+            if (!authenticated) return;
+
+            const profile = await Auth.getProfile();
+            if (profile) {
+                App.updateUserInfo(profile);
+            }
+
+            const pageTitle = document.getElementById('page-title');
+            if (pageTitle) pageTitle.textContent = 'Payment Requests & Verification Center';
+
+            if (typeof PaymentRequestsModule !== 'undefined') {
+                await PaymentRequestsModule.init();
+            }
+        });
+    </script>
+</body>
+</html>

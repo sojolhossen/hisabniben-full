@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SMS Packages Management Center - HisabNiben Admin</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/sms-packages.css">
+    <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+    <div class="admin-wrapper">
+        <div id="sidebar-container"></div>
+
+        <main class="main-content">
+            <div id="navbar-container"></div>
+
+            <div class="page-content users-page-bg">
+
+                <!-- GLOBAL PAGE HEADER -->
+                <header class="dashboard-header-bar">
+                    <div class="header-greeting">
+                        <h2><i class="fas fa-sms" style="color: var(--primary);"></i> SMS Packages Management Center</h2>
+                        <p id="sync-timestamp-subtitle">Manage SMS bundles, pricing, per-SMS unit cost, and live Firestore sync. • Synced just now</p>
+                    </div>
+
+                    <div class="header-controls">
+                        <button class="btn btn-sm users-btn-primary" onclick="SmsPackagesModule.openAddModal()" title="Create Package">
+                            <i class="fas fa-plus-circle"></i> Create Package
+                        </button>
+
+                        <button class="btn btn-sm users-btn-outline" onclick="SmsPackagesModule.exportCSV()" title="Export CSV">
+                            <i class="fas fa-file-csv"></i> Export CSV
+                        </button>
+
+                        <button class="btn btn-sm users-btn-outline" onclick="SmsPackagesModule.refresh()" title="Reload Data">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
+                </header>
+
+                <!-- 4 BENTO KPI SUMMARY CARDS -->
+                <section class="kpi-command-grid-4" aria-label="SMS Summary">
+                    
+                    <!-- 1. TOTAL PACKAGES -->
+                    <article class="kpi-card" onclick="SmsPackagesModule.applyStatusFilter('all')">
+                        <div class="kpi-header">
+                            <div class="kpi-icon-badge users"><i class="fas fa-boxes"></i></div>
+                            <div class="kpi-trend up"><i class="fas fa-layer-group"></i> All</div>
+                        </div>
+                        <div class="kpi-value" id="total-packages-count">0</div>
+                        <div class="kpi-label">Total SMS Packages</div>
+                    </article>
+
+                    <!-- 2. ACTIVE PACKAGES -->
+                    <article class="kpi-card" onclick="SmsPackagesModule.applyStatusFilter('active')">
+                        <div class="kpi-header">
+                            <div class="kpi-icon-badge premium"><i class="fas fa-check-circle"></i></div>
+                            <div class="kpi-trend up"><i class="fas fa-play"></i> Active</div>
+                        </div>
+                        <div class="kpi-value" id="active-packages-count">0</div>
+                        <div class="kpi-label">Live App Bundles</div>
+                    </article>
+
+                    <!-- 3. INACTIVE PACKAGES -->
+                    <article class="kpi-card" onclick="SmsPackagesModule.applyStatusFilter('inactive')">
+                        <div class="kpi-header">
+                            <div class="kpi-icon-badge expired"><i class="fas fa-times-circle"></i></div>
+                            <div class="kpi-trend down"><i class="fas fa-pause"></i> Disabled</div>
+                        </div>
+                        <div class="kpi-value" id="inactive-packages-count">0</div>
+                        <div class="kpi-label">Disabled Packages</div>
+                    </article>
+
+                    <!-- 4. TOTAL SMS VOLUME -->
+                    <article class="kpi-card">
+                        <div class="kpi-header">
+                            <div class="kpi-icon-badge sms"><i class="fas fa-comment-dots"></i></div>
+                            <div class="kpi-trend neutral">Volume</div>
+                        </div>
+                        <div class="kpi-value" id="total-sms-count">0</div>
+                        <div class="kpi-label">Total Active SMS Volume</div>
+                    </article>
+                </section>
+
+                <!-- PERFORMANCE HIGHLIGHT CARDS -->
+                <section class="perf-highlights-grid">
+                    <article class="perf-card">
+                        <div class="perf-icon-wrap best-value"><i class="fas fa-award"></i></div>
+                        <div class="perf-info">
+                            <h6>Best Value Bundle</h6>
+                            <div class="perf-title" id="bv-name">Mega SMS Pack</div>
+                            <div class="perf-sub" id="bv-sub">Lowest per-SMS unit cost</div>
+                        </div>
+                    </article>
+
+                    <article class="perf-card">
+                        <div class="perf-icon-wrap cheapest"><i class="fas fa-tag"></i></div>
+                        <div class="perf-info">
+                            <h6>Cheapest Option</h6>
+                            <div class="perf-title" id="cheap-name">Starter SMS Pack</div>
+                            <div class="perf-sub" id="cheap-sub">Lowest entry price</div>
+                        </div>
+                    </article>
+
+                    <article class="perf-card">
+                        <div class="perf-icon-wrap highest"><i class="fas fa-layer-group"></i></div>
+                        <div class="perf-info">
+                            <h6>Highest Volume Pack</h6>
+                            <div class="perf-title" id="hv-name">Enterprise 5000 SMS</div>
+                            <div class="perf-sub" id="hv-sub">Maximum SMS quantity</div>
+                        </div>
+                    </article>
+                </section>
+
+                <!-- GLOBAL SEARCH & FILTER PANEL -->
+                <section class="chart-card users-surface-card users-filter-card" style="margin-bottom: 24px;">
+                    <div class="chart-header users-card-header">
+                        <div class="users-card-header-text">
+                            <h5><i class="fas fa-magnifying-glass"></i> Search & Filter SMS Packages</h5>
+                            <p class="chart-subtitle">Filter by package name, SMS quantity, Play Store product ID, or status</p>
+                        </div>
+                        <div class="chart-actions">
+                            <button type="button" class="btn btn-sm users-btn-clear" onclick="SmsPackagesModule.resetFilters()">
+                                <i class="fas fa-times"></i> Reset Filters
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="chart-body users-card-body-tight">
+                        <div class="pkg-filter-bar">
+                            <!-- SEARCH BOX -->
+                            <div class="pkg-search-box">
+                                <i class="fas fa-search pkg-search-icon"></i>
+                                <input type="text" class="pkg-search-input" placeholder="Type package name, SMS count, Play Store ID..." id="search-packages" autocomplete="off">
+                            </div>
+
+                            <!-- FILTER DROPDOWNS BAR -->
+                            <div class="pkg-filter-dropdowns">
+                                <div class="pkg-select-wrap">
+                                    <i class="fas fa-toggle-on pkg-select-icon"></i>
+                                    <select class="pkg-filter-select" id="filter-status" onchange="SmsPackagesModule.applyFilters()">
+                                        <option value="all">All Statuses</option>
+                                        <option value="active">Active Only</option>
+                                        <option value="inactive">Inactive Only</option>
+                                        <option value="archived">Archived Only</option>
+                                    </select>
+                                </div>
+
+                                <div class="pkg-select-wrap">
+                                    <i class="fas fa-comment-dots pkg-select-icon"></i>
+                                    <select class="pkg-filter-select" id="filter-sms-range" onchange="SmsPackagesModule.applyFilters()">
+                                        <option value="all">All SMS Quantities</option>
+                                        <option value="50">50+ SMS</option>
+                                        <option value="100">100+ SMS</option>
+                                        <option value="500">500+ SMS</option>
+                                        <option value="1000">1000+ SMS</option>
+                                    </select>
+                                </div>
+
+                                <div class="pkg-select-wrap">
+                                    <i class="fas fa-sort pkg-select-icon"></i>
+                                    <select class="pkg-filter-select" id="filter-sort" onchange="SmsPackagesModule.applyFilters()">
+                                        <option value="price_asc">Price: Low to High</option>
+                                        <option value="price_desc">Price: High to Low</option>
+                                        <option value="sms_desc">SMS: High to Low</option>
+                                        <option value="sort_order">Sort Order</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="active-filter-chips" style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px;"></div>
+                    </div>
+                </section>
+
+                <!-- DIRECTORY TABLE / GRID VIEW CONTAINER -->
+                <section class="chart-card users-surface-card users-table-card">
+                    <div class="chart-header users-card-header users-table-header">
+                        <div class="users-card-header-text">
+                            <h5><i class="fas fa-table"></i> SMS Packages Directory</h5>
+                            <p class="chart-subtitle" id="showing-count">Showing 0 packages</p>
+                        </div>
+                        <div class="chart-actions">
+                            <button type="button" class="btn users-view-toggle" id="toggle-view" onclick="SmsPackagesModule.toggleView()">
+                                <i class="fas fa-th" id="view-toggle-icon"></i>
+                                <span id="view-toggle-text">Grid view</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- TABLE VIEW CONTAINER -->
+                    <div class="chart-body users-table-body" id="table-view-container">
+                        <div class="table-container users-table-scroll" style="overflow-x: auto;">
+                            <table id="sms-packages-table" class="data-table-modern users-data-table" style="width:100%">
+                                <thead>
+                                    <tr>
+                                        <th width="5%">#</th>
+                                        <th width="24%">Package Name</th>
+                                        <th width="12%">SMS Count</th>
+                                        <th width="12%">Price (৳)</th>
+                                        <th width="14%">Price / SMS</th>
+                                        <th width="14%">Play Store ID</th>
+                                        <th width="8%">Status</th>
+                                        <th width="11%">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="sms-packages-tbody">
+                                    <tr>
+                                        <td colspan="8" style="text-align: center; padding: 30px; color: var(--gray-400);">
+                                            <div class="spinner" style="margin: 0 auto 10px auto;"></div>
+                                            Loading SMS packages...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- GRID CARD VIEW CONTAINER -->
+                    <div id="grid-view-container" style="display: none;" class="users-grid-container">
+                        <!-- Rendered by JS -->
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- ADD / EDIT SMS PACKAGE MODAL WITH LIVE UNIT COST CALCULATOR -->
+    <div class="modal-overlay" id="sms-package-modal">
+        <div class="modal-dialog users-modal-shell">
+            <div class="modal-content users-modal-content">
+                <div class="modal-header users-modal-header">
+                    <h5 id="sms-package-modal-title"><i class="fas fa-plus-circle"></i> Create SMS Package</h5>
+                    <button type="button" class="modal-close" onclick="SmsPackagesModule.closeModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <form id="sms-package-form" onsubmit="SmsPackagesModule.savePackage(event)">
+                    <input type="hidden" id="sms-package-id">
+
+                    <div class="modal-body users-modal-body" style="padding: 24px;">
+                        
+                        <!-- LIVE UNIT COST CALCULATOR BOX -->
+                        <div class="unit-cost-calc-box">
+                            <div>
+                                <div class="cost-title">Unit Cost Calculation</div>
+                                <div style="font-size: 12px; color: var(--gray-500);" id="calc-breakdown">500 SMS • ৳200</div>
+                            </div>
+                            <div class="cost-val" id="calc-unit-price">৳0.40 / SMS</div>
+                        </div>
+
+                        <div class="sms-modal-row">
+                            <div>
+                                <label>Package Name *</label>
+                                <input type="text" class="form-input" id="sms-package-name" placeholder="e.g. Starter Pack - 500 SMS" required oninput="SmsPackagesModule.updateLiveUnitCost()">
+                            </div>
+                            <div>
+                                <label>SMS Quantity *</label>
+                                <input type="number" class="form-input" id="sms-package-count" placeholder="500" required oninput="SmsPackagesModule.updateLiveUnitCost()">
+                            </div>
+                        </div>
+
+                        <div class="sms-modal-row">
+                            <div>
+                                <label>Price (৳) *</label>
+                                <input type="number" class="form-input" id="sms-package-price" placeholder="200" required oninput="SmsPackagesModule.updateLiveUnitCost()">
+                            </div>
+                            <div>
+                                <label>Play Store Product ID</label>
+                                <input type="text" class="form-input" id="sms-package-product-id" placeholder="hisabniben_sms_500">
+                            </div>
+                        </div>
+
+                        <div class="sms-modal-group">
+                            <label>Description</label>
+                            <textarea class="form-input" id="sms-package-description" rows="2" placeholder="Brief details about this SMS bundle..."></textarea>
+                        </div>
+
+                        <div class="sms-modal-row">
+                            <div>
+                                <label>Sort Order</label>
+                                <input type="number" class="form-input" id="sms-package-sort" value="1">
+                            </div>
+                            <div>
+                                <label>Status</label>
+                                <select class="form-input" id="sms-package-status">
+                                    <option value="active">Active (Live in App)</option>
+                                    <option value="inactive">Inactive (Hidden)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border-color);">
+                            <button type="button" class="btn btn-outline" onclick="SmsPackagesModule.closeModal()">Cancel</button>
+                            <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save SMS Package</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="loader-container"></div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <script src="config/config.js"></script>
+    <script src="js/firebase.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/sms-packages.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            await App.loadComponent('sidebar-container', 'components/sidebar.html');
+            await App.loadComponent('navbar-container', 'components/navbar.html');
+            await App.loadComponent('loader-container', 'components/loader.html');
+
+            const authenticated = await Auth.requireAuth();
+            if (!authenticated) return;
+
+            const profile = await Auth.getProfile();
+            if (profile) {
+                App.updateUserInfo(profile);
+            }
+
+            document.getElementById('page-title').textContent = 'SMS Packages Management Center';
+            await SmsPackagesModule.init();
+        });
+    </script>
+</body>
+</html>

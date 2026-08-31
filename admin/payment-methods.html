@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Methods Center - HisabNiben Admin</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/payment-methods.css?v=1.0.2">
+    <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+    <div class="admin-wrapper">
+        <div id="sidebar-container"></div>
+
+        <main class="main-content">
+            <div id="navbar-container"></div>
+
+            <div class="page-content users-page-bg">
+
+                <!-- GLOBAL PAGE HEADER -->
+                <header class="dashboard-header-bar">
+                    <div class="header-greeting">
+                        <h2>
+                            <i class="fas fa-wallet" style="color: var(--primary);"></i> Payment Methods Center
+                            <span class="badge" style="background:rgba(16,185,129,0.12); color:#10B981; font-size:12px; font-weight:800; padding:4px 12px; border-radius:12px; margin-left:10px;">
+                                <span class="status-dot connected"></span> Operational
+                            </span>
+                        </h2>
+                        <p id="sync-timestamp-subtitle">Configure merchant/personal receiver accounts, payment instructions, and active gateway routes for the Android mobile app. • Synced just now</p>
+                    </div>
+
+                    <div class="header-controls">
+                        <button class="btn btn-sm users-btn-primary" onclick="PaymentMethodsModule.openAddModal()" title="Add Payment Method">
+                            <i class="fas fa-plus"></i> Add Payment Method
+                        </button>
+
+                        <button class="btn btn-sm users-btn-outline" onclick="PaymentMethodsModule.refresh()" title="Reload Data">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
+                </header>
+
+                <!-- 4 BENTO KPI SUMMARY CARDS -->
+                <section class="kpi-command-grid-4" aria-label="Payment Methods Summary">
+                    
+                    <!-- 1. TOTAL METHODS -->
+                    <article class="kpi-card" onclick="PaymentMethodsModule.applyStatusFilter('all')">
+                        <div class="kpi-header">
+                            <div class="kpi-icon-badge users"><i class="fas fa-credit-card"></i></div>
+                            <div class="kpi-trend up"><i class="fas fa-layer-group"></i> All</div>
+                        </div>
+                        <div class="kpi-value" id="kpi-total-methods">0</div>
+                        <div class="kpi-label">Total Payment Methods</div>
+                    </article>
+
+                    <!-- 2. ACTIVE METHODS -->
+                    <article class="kpi-card" onclick="PaymentMethodsModule.applyStatusFilter('active')">
+                        <div class="kpi-header">
+                            <div class="kpi-icon-badge premium"><i class="fas fa-check-circle"></i></div>
+                            <div class="kpi-trend up"><i class="fas fa-check"></i> Live</div>
+                        </div>
+                        <div class="kpi-value" id="kpi-active-methods" style="color: #10B981;">0</div>
+                        <div class="kpi-label">Active Gateway Methods</div>
+                    </article>
+
+                    <!-- 3. INACTIVE METHODS -->
+                    <article class="kpi-card" onclick="PaymentMethodsModule.applyStatusFilter('inactive')">
+                        <div class="kpi-header">
+                            <div class="kpi-icon-badge expired"><i class="fas fa-ban"></i></div>
+                            <div class="kpi-trend down">Hidden</div>
+                        </div>
+                        <div class="kpi-value" id="kpi-inactive-methods">0</div>
+                        <div class="kpi-label">Inactive Methods</div>
+                    </article>
+
+                    <!-- 4. ACCOUNT TYPES BREAKDOWN -->
+                    <article class="kpi-card">
+                        <div class="kpi-header">
+                            <div class="kpi-icon-badge revenue"><i class="fas fa-building-columns"></i></div>
+                            <div class="kpi-trend up">Accounts</div>
+                        </div>
+                        <div class="kpi-value" id="kpi-types-count">0 Types</div>
+                        <div class="kpi-label">Configured Account Types</div>
+                    </article>
+                </section>
+
+                <!-- GLOBAL SEARCH & FILTER PANEL -->
+                <section class="chart-card users-surface-card users-filter-card" style="margin-bottom: 24px;">
+                    <div class="chart-header users-card-header">
+                        <div class="users-card-header-text">
+                            <h5><i class="fas fa-magnifying-glass"></i> Search & Filter Payment Methods</h5>
+                            <p class="chart-subtitle">Filter by method name, receiver account number, account holder, or instructions</p>
+                        </div>
+                        <div class="chart-actions">
+                            <button type="button" class="btn btn-sm users-btn-clear" onclick="PaymentMethodsModule.resetFilters()">
+                                <i class="fas fa-times"></i> Reset Filters
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="chart-body users-card-body-tight">
+                        <div class="pkg-filter-bar">
+                            <div class="pkg-search-box">
+                                <i class="fas fa-search pkg-search-icon"></i>
+                                <input type="text" class="pkg-search-input" placeholder="Type method name, account number, holder name..." id="search-methods" autocomplete="off">
+                            </div>
+
+                            <div class="pkg-filter-dropdowns">
+                                <div class="pkg-select-wrap">
+                                    <i class="fas fa-toggle-on pkg-select-icon"></i>
+                                    <select class="pkg-filter-select" id="filter-status" onchange="PaymentMethodsModule.applyFilters()">
+                                        <option value="all">All Statuses</option>
+                                        <option value="active">✅ Active Only</option>
+                                        <option value="inactive">🚫 Inactive Only</option>
+                                    </select>
+                                </div>
+
+                                <div class="pkg-select-wrap">
+                                    <i class="fas fa-tags pkg-select-icon"></i>
+                                    <select class="pkg-filter-select" id="filter-type" onchange="PaymentMethodsModule.applyFilters()">
+                                        <option value="all">All Account Types</option>
+                                        <option value="Personal">Personal</option>
+                                        <option value="Agent">Agent</option>
+                                        <option value="Merchant">Merchant</option>
+                                        <option value="Bank Account">Bank Account</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="active-filter-chips" style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px;"></div>
+                    </div>
+                </section>
+
+                <!-- PAYMENT METHODS CARDS CONTAINER -->
+                <section class="chart-card users-surface-card" style="margin-bottom: 24px;">
+                    <div class="chart-header users-card-header">
+                        <div class="users-card-header-text">
+                            <h5><i class="fas fa-wallet"></i> Payment Methods Directory (`payment_methods`)</h5>
+                            <p class="chart-subtitle" id="showing-count">Loading payment methods from Firestore...</p>
+                        </div>
+                    </div>
+
+                    <div class="chart-body users-card-body-tight">
+                        <div class="payment-methods-grid" id="methods-grid-container">
+                            <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--gray-400);">
+                                <div class="spinner" style="margin: 0 auto 10px auto;"></div>
+                                Loading payment methods...
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- ADD / EDIT PAYMENT METHOD MODAL WITH LIVE PREVIEW -->
+    <div class="modal-overlay" id="pm-modal">
+        <div class="modal-dialog users-modal-shell">
+            <div class="modal-content users-modal-content">
+                <div class="modal-header users-modal-header">
+                    <h5 id="pm-modal-title"><i class="fas fa-wallet"></i> Add New Payment Method</h5>
+                    <button type="button" class="modal-close" onclick="PaymentMethodsModule.closeModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <form id="pm-form" onsubmit="PaymentMethodsModule.savePaymentMethod(event)">
+                    <div class="modal-body users-modal-body" style="padding: 20px;">
+                        
+                        <div class="pm-split-layout">
+                            
+                            <!-- LEFT FORM FIELDS -->
+                            <div>
+                                <div class="modern-form-group">
+                                    <label>Payment Method Name *</label>
+                                    <input type="text" class="form-input" id="pm-name" placeholder="e.g. bKash Merchant" required oninput="PaymentMethodsModule.updateLivePreview()">
+                                </div>
+
+                                <div class="modern-form-row">
+                                    <div>
+                                        <label>Account Type *</label>
+                                        <select class="form-input" id="pm-type" required onchange="PaymentMethodsModule.updateLivePreview()">
+                                            <option value="Personal">Personal</option>
+                                            <option value="Agent">Agent</option>
+                                            <option value="Merchant">Merchant</option>
+                                            <option value="Bank Account">Bank Account</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label>Sort Order</label>
+                                        <input type="number" class="form-input" id="pm-sort" value="1" min="0" oninput="PaymentMethodsModule.updateLivePreview()">
+                                    </div>
+                                </div>
+
+                                <div class="modern-form-group">
+                                    <label>Account / Receiver Number *</label>
+                                    <input type="text" class="form-input" id="pm-account-number" placeholder="e.g. 01700000000" required oninput="PaymentMethodsModule.updateLivePreview()">
+                                </div>
+
+                                <div class="modern-form-group">
+                                    <label>Account Holder Name (Optional)</label>
+                                    <input type="text" class="form-input" id="pm-account-name" placeholder="e.g. HisabNiben Ltd" oninput="PaymentMethodsModule.updateLivePreview()">
+                                </div>
+
+                                <div class="modern-form-group">
+                                    <label>Instructions / Help Note</label>
+                                    <textarea class="form-input" id="pm-instructions" rows="2" placeholder="e.g. Make payment to merchant number and enter TrxID." oninput="PaymentMethodsModule.updateLivePreview()"></textarea>
+                                </div>
+
+                                <div class="modern-form-group" style="margin-bottom: 0;">
+                                    <label style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
+                                        <span>Active Status (Live in App)</span>
+                                        <input type="checkbox" id="pm-active" checked onchange="PaymentMethodsModule.updateLivePreview()">
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- RIGHT LIVE MOBILE PREVIEW CARD -->
+                            <div>
+                                <label style="display: block; font-size: 11px; font-weight: 800; color: var(--gray-500); text-transform: uppercase; margin-bottom: 8px;">
+                                    <i class="fas fa-mobile-screen"></i> Live App Receiver Card Preview
+                                </label>
+                                
+                                <div class="app-preview-card">
+                                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;">
+                                        <div style="display: flex; align-items: center; gap: 10px;">
+                                            <div class="pm-icon-badge bkash" id="preview-icon-badge" style="width: 36px; height: 36px; font-size: 16px;">
+                                                <i class="fas fa-wallet" id="preview-icon"></i>
+                                            </div>
+                                            <div>
+                                                <div style="font-size: 14px; font-weight: 800;" id="preview-name">bKash Merchant</div>
+                                                <div style="font-size: 10px; color: #94A3B8;" id="preview-type">MERCHANT</div>
+                                            </div>
+                                        </div>
+                                        <span class="badge" style="background: rgba(16,185,129,0.2); color: #34D399; font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 8px;" id="preview-status">ACTIVE</span>
+                                    </div>
+
+                                    <div style="background: rgba(255,255,255,0.06); border: 1px dashed rgba(255,255,255,0.15); border-radius: 10px; padding: 10px; margin-bottom: 12px;">
+                                        <div style="font-size: 10px; color: #94A3B8; margin-bottom: 2px;">Receiver Account Number</div>
+                                        <div style="font-size: 15px; font-weight: 800; color: #F8FAFC; letter-spacing: 0.5px;" id="preview-number">01700000000</div>
+                                        <div style="font-size: 11px; color: #CBD5E1; margin-top: 2px;" id="preview-holder">HisabNiben Ltd</div>
+                                    </div>
+
+                                    <div style="font-size: 11px; color: #94A3B8; line-height: 1.4;" id="preview-instructions">
+                                        Make payment to merchant number and enter TrxID.
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="modal-footer users-modal-footer" style="padding-left: 0; padding-right: 0; margin-top: 20px;">
+                            <button type="button" class="btn btn-outline" onclick="PaymentMethodsModule.closeModal()">Cancel</button>
+                            <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save Payment Method</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="loader-container"></div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <script src="config/config.js"></script>
+    <script src="js/firebase.js"></script>
+    <script src="js/utils.js?v=1.0.2"></script>
+    <script src="js/main.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/payment-methods.js?v=1.0.2"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            await App.loadComponent('sidebar-container', 'components/sidebar.html');
+            await App.loadComponent('navbar-container', 'components/navbar.html');
+            await App.loadComponent('loader-container', 'components/loader.html');
+
+            const authenticated = await Auth.requireAuth();
+            if (!authenticated) return;
+
+            const profile = await Auth.getProfile();
+            if (profile) {
+                App.updateUserInfo(profile);
+            }
+
+            const pageTitle = document.getElementById('page-title');
+            if (pageTitle) pageTitle.textContent = 'Payment Methods Center';
+
+            if (typeof PaymentMethodsModule !== 'undefined') {
+                await PaymentMethodsModule.init();
+            }
+        });
+    </script>
+</body>
+</html>

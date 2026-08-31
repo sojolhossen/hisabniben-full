@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="primary">#F54927</color>
+    <color name="primary_dark">#C43820</color>
+    <color name="primary_light">#FF7B5E</color>
+    <color name="accent">#F54927</color>
+    
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="gray">#6B7280</color>
+    
+    <color name="text_primary">#1A1A2E</color>
+    <color name="text_secondary">#6B7280</color>
+    <color name="text_hint">#9CA3AF</color>
+    
+    <color name="background">#F8FAFC</color>
+    <color name="window_background">#F8FAFC</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="card_background">#FFFFFF</color>
+    
+    <color name="success">#10B981</color>
+    <color name="brand_green">#10B981</color>
+    <color name="warning">#F59E0B</color>
+    <color name="error">#EF4444</color>
+    
+    <color name="trial">#F59E0B</color>
+    <color name="premium">#10B981</color>
+    <color name="expired">#EF4444</color>
+    
+    <color name="payment_color">#10B981</color>
+    <color name="baki_color">#F54927</color>
+    
+    <color name="divider">#E5E7EB</color>
+    
+    <color name="gradient_start">#F54927</color>
+    <color name="gradient_end">#FF7B5E</color>
+    
+    <color name="card_baki">#F54927</color>
+    <color name="card_customers">#6366F1</color>
+    <color name="card_payments">#10B981</color>
+    <color name="card_transactions">#8B5CF6</color>
+    
+    <color name="purple">#8B5CF6</color>
+    
+    <color name="chip_in_stock">#D1FAE5</color>
+    <color name="chip_in_stock_checked">#2E7D32</color>
+    <color name="chip_low_stock">#FEF3C7</color>
+    <color name="chip_low_stock_checked">#F57F17</color>
+    <color name="chip_out_of_stock">#FEE2E2</color>
+    <color name="chip_out_of_stock_checked">#C62828</color>
+</resources>

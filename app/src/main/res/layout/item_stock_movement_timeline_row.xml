@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:padding="10dp"
+    android:layout_marginBottom="6dp"
+    android:background="@drawable/bg_info_card">
+
+    <ImageView
+        android:id="@+id/ivMovementTypeIcon"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:src="@drawable/ic_stock"
+        app:tint="@color/primary" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginStart="10dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tvMovementReason"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="চাল ক্রয় (Memo #PUR-1002)"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:textColor="@color/text_primary" />
+
+        <TextView
+            android:id="@+id/tvMovementDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:text="25 Aug 2026, 06:15 PM"
+            android:textSize="11sp"
+            android:textColor="@color/text_secondary" />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tvMovementQty"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="+500 KG"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:textColor="@color/primary" />
+
+</LinearLayout>

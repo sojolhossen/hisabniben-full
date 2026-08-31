@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Executive Control Center - HisabNiben Admin</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.0/dist/chart.umd.min.js"></script>
+
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+    <div class="admin-wrapper">
+        <div id="sidebar-container"></div>
+
+        <main class="main-content">
+            <div id="navbar-container"></div>
+
+            <div class="page-content users-page-bg">
+                
+                <!-- GLOBAL DASHBOARD HEADER & CONTROLS -->
+                <header class="dashboard-header-bar">
+                    <div class="header-greeting">
+                        <h2><span id="time-greeting">Good morning</span>, <span id="admin-name">Super Admin</span> 👋</h2>
+                        <p>Here is what's happening across the HisabNiben platform today.</p>
+                    </div>
+
+                    <div class="header-controls">
+                        <div class="date-range-picker">
+                            <i class="fas fa-calendar-alt"></i>
+                            <select id="dashboard-date-range">
+                                <option value="today">Today</option>
+                                <option value="yesterday">Yesterday</option>
+                                <option value="7d">Last 7 Days</option>
+                                <option value="30d" selected>Last 30 Days</option>
+                                <option value="90d">Last 90 Days</option>
+                                <option value="this_month">This Month</option>
+                                <option value="last_month">Last Month</option>
+                            </select>
+                        </div>
+
+                        <button class="btn btn-sm users-btn-outline" onclick="DashboardModule.loadData()" title="Reload All Data">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+
+                        <button class="btn btn-sm users-btn-outline" onclick="DashboardModule.toggleCommandPalette(true)" title="Command Palette (Ctrl + K)">
+                            <i class="fas fa-terminal"></i> Ctrl + K
+                        </button>
+
+                        <button class="btn btn-sm users-btn-primary" onclick="window.location.href='payment-requests.html'">
+                            <i class="fas fa-bolt"></i> Action Center
+                        </button>
+                    </div>
+                </header>
+
+                <!-- ALERT CENTER BANNER (DYNAMIC) -->
+                <div id="dashboard-alert-banner" class="alert-center-banner" style="display: none;">
+                    <div class="alert-info">
+                        <div class="alert-icon"><i class="fas fa-bell"></i></div>
+                        <div>
+                            <strong id="alert-banner-title">Operational Notice</strong>
+                            <p id="alert-banner-desc" style="font-size: 13px; opacity: 0.9; font-weight: 400; margin-top: 2px;"></p>
+                        </div>
+                    </div>
+                    <div class="alert-actions">
+                        <a href="payment-requests.html" id="alert-banner-btn" class="btn btn-sm users-btn-primary">Review Now</a>
+                    </div>
+                </div>
+
+                <!-- TOP 8 KPI COMMAND CENTER -->
+                <section class="kpi-command-grid" aria-label="KPI Command Center">
+                    
+                    <!-- 1. TOTAL USERS -->
+                    <article class="kpi-card" onclick="window.location.href='users.html'">
+                        <div class="kpi-header">
+                            <div class="kpi-icon-badge users"><i class="fas fa-users"></i></div>
+                            <div class="kpi-trend up" id="kpi-users-trend"><i class="fas fa-arrow-up"></i> 0%</div>
+                        </div>
+                        <div class="kpi-value" id="kpi-total-users">0</div>
+                        <div class="kpi-label">Total Registered Users</div>
+                        <div class="kpi-subtext">
+                            <span>Today: <strong id="kpi-users-today">0</strong></span>
+                            <span>This Month: <strong id="kpi-users-month">0</strong></span>
+                        </div>
+                    </article>
+
+                    <!-- 2. ACTIVE PREMIUM USERS -->
+                    <article class="kpi-card" onclick="window.location.href='users.html?status=premium'">
+                        <div class="kpi-header">
+                            <div class="kpi-icon-badge premium"><i class="fas fa-crown"></i></div>
+                            <div class="kpi-trend up" id="kpi-premium-trend"><i class="fas fa-arrow-up"></i> 0%</div>
+                        </div>
+                        <div class="kpi-value" id="kpi-premium-users">0</div>
+                        <div class="kpi-label">Active Premium Users</div>
+                        <div class="kpi-subtext">
+                            <span>Expiring 7 Days: <strong id="kpi-premium-exp-7d" style="color: var(--warning);">0</strong></span>
+                            <span>Life-Time: <strong id="kpi-lifetime-users">0</strong></span>
+                        </div>
+                    </article>
+
+                    <!-- 3. TRIAL USERS -->
+                    <article class="kpi-card" onclick="window.location.href='users.html?status=trial'">
+                        <div class="kpi-header">
+                            <div class="kpi-icon-badge trial"><i class="fas fa-flask"></i></div>
+                            <div class="kpi-trend neutral" id="kpi-trial-conv">Conv: 0%</div>
+                        </div>
+                        <div class="kpi-value" id="kpi-trial-users">0</div>
+                        <div class="kpi-label">Active 7-Day Trials</div>
+                        <div class="kpi-subtext">
+                            <span>Ends Today: <strong id="kpi-trial-today" style="color: var(--danger);">0</strong></span>
+                            <span>Ends 3 Days: <strong id="kpi-trial-3d">0</strong></span>
+                        </div>
+                    </article>
+
+                    <!-- 4. EXPIRED USERS -->
+                    <article class="kpi-card" onclick="window.location.href='users.html?status=expired'">
+                        <div class="kpi-header">
+                            <div class="kpi-icon-badge expired"><i class="fas fa-clock-rotate-left"></i></div>
+                            <div class="kpi-trend down" id="kpi-expired-trend"><i class="fas fa-user-xmark"></i> Expired</div>
+                        </div>
+                        <div class="kpi-value" id="kpi-expired-users">0</div>
+                        <div class="kpi-label">Expired Accounts</div>
+                        <div class="kpi-subtext">
+                            <span>Expired Today: <strong id="kpi-expired-today">0</strong></span>
+                            <span>Expired Week: <strong id="kpi-expired-week">0</strong></span>
+                        </div>
+                    </article>
+
+                    <!-- 5. TOTAL REVENUE -->
+                    <article class="kpi-card" onclick="window.location.href='purchase-history.html'">
+                        <div class="kpi-header">
+                            <div class="kpi-icon-badge revenue"><i class="fas fa-bangladeshi-taka-sign"></i></div>
+                            <div class="kpi-trend up" id="kpi-revenue-trend"><i class="fas fa-arrow-up"></i> 0%</div>
+                        </div>
+                        <div class="kpi-value" id="kpi-total-revenue">৳0</div>
+                        <div class="kpi-label">Approved Revenue</div>
+                        <div class="kpi-subtext">
+                            <span>Today: <strong id="kpi-revenue-today">৳0</strong></span>
+                            <span>This Month: <strong id="kpi-revenue-month">৳0</strong></span>
+                        </div>
+                    </article>
+
+                    <!-- 6. PENDING PAYMENTS -->
+                    <article class="kpi-card" id="kpi-card-pending" onclick="window.location.href='payment-requests.html'">
+                        <div class="kpi-header">
+                            <div class="kpi-icon-badge pending"><i class="fas fa-hourglass-half"></i></div>
+                            <div class="kpi-trend neutral" id="kpi-pending-status">Action Needed</div>
+                        </div>
+                        <div class="kpi-value" id="kpi-pending-count">0</div>
+                        <div class="kpi-label">Pending Payment Requests</div>
+                        <div class="kpi-subtext">
+                            <span>Amount: <strong id="kpi-pending-amount" style="color: var(--warning);">৳0</strong></span>
+                            <span>Oldest: <strong id="kpi-pending-oldest">None</strong></span>
+                        </div>
+                    </article>
+
+                    <!-- 7. SMS USAGE -->
+                    <article class="kpi-card" onclick="window.location.href='sms-packages.html'">
+                        <div class="kpi-header">
+                            <div class="kpi-icon-badge sms"><i class="fas fa-comment-sms"></i></div>
+                            <div class="kpi-trend neutral" id="kpi-sms-status">API Active</div>
+                        </div>
+                        <div class="kpi-value" id="kpi-sms-sent-month">0</div>
+                        <div class="kpi-label">SMS Sent This Month</div>
+                        <div class="kpi-subtext">
+                            <span>Sent Today: <strong id="kpi-sms-sent-today">0</strong></span>
+                            <span>Users Balance: <strong id="kpi-sms-total-balance">0</strong></span>
+                        </div>
+                    </article>
+
+                    <!-- 8. TOTAL TRANSACTIONS -->
+                    <article class="kpi-card" onclick="window.location.href='index.html#activity'">
+                        <div class="kpi-header">
+                            <div class="kpi-icon-badge tx"><i class="fas fa-exchange-alt"></i></div>
+                            <div class="kpi-trend up" id="kpi-tx-trend"><i class="fas fa-arrow-up"></i> 0%</div>
+                        </div>
+                        <div class="kpi-value" id="kpi-total-transactions">0</div>
+                        <div class="kpi-label">App Business Transactions</div>
+                        <div class="kpi-subtext">
+                            <span>Today: <strong id="kpi-tx-today">0</strong></span>
+                            <span>This Month: <strong id="kpi-tx-month">0</strong></span>
+                        </div>
+                    </article>
+
+                </section>
+
+                <!-- REVENUE & SUBSCRIPTION COMMAND CENTER -->
+                <section class="revenue-section users-surface-card mb-4" style="margin-bottom: 24px;">
+                    <div class="revenue-card">
+                        <div class="chart-header users-card-header">
+                            <div class="users-card-header-text">
+                                <h5><i class="fas fa-chart-line"></i> Subscription Revenue Command Center</h5>
+                                <p class="chart-subtitle">Track verified approved revenue & subscription trends over time</p>
+                            </div>
+                            <div class="chart-actions">
+                                <select class="period-selector" id="revenue-chart-metric" style="margin-right: 8px;">
+                                    <option value="revenue" selected>Revenue (৳)</option>
+                                    <option value="subscriptions">Paid Subscriptions</option>
+                                </select>
+                                <button class="btn btn-sm users-btn-outline" id="btn-export-revenue" onclick="DashboardModule.exportRevenueCSV()">
+                                    <i class="fas fa-download"></i> CSV Export
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="revenue-stats">
+                                <div class="revenue-item">
+                                    <div class="revenue-icon success"><i class="fas fa-bangladeshi-taka-sign"></i></div>
+                                    <div class="revenue-info">
+                                        <div class="revenue-value" id="stat-chart-total-rev">৳0</div>
+                                        <div class="revenue-label">Total Verified Revenue</div>
+                                    </div>
+                                </div>
+                                <div class="revenue-item">
+                                    <div class="revenue-icon primary"><i class="fas fa-chart-simple"></i></div>
+                                    <div class="revenue-info">
+                                        <div class="revenue-value" id="stat-chart-daily-avg">৳0</div>
+                                        <div class="revenue-label">Daily Average</div>
+                                    </div>
+                                </div>
+                                <div class="revenue-item">
+                                    <div class="revenue-icon info"><i class="fas fa-trophy"></i></div>
+                                    <div class="revenue-info">
+                                        <div class="revenue-value" id="stat-chart-peak-day">৳0</div>
+                                        <div class="revenue-label">Peak Revenue Day</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="revenue-chart">
+                                <canvas id="revenueChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- CONVERSION FUNNEL & USER DISTRIBUTION -->
+                <section class="charts-grid" style="margin-bottom: 24px;">
+                    
+                    <!-- FUNNEL CARD -->
+                    <article class="chart-card users-surface-card">
+                        <div class="chart-header users-card-header">
+                            <div class="users-card-header-text">
+                                <h5><i class="fas fa-filter"></i> Subscription Conversion Funnel</h5>
+                                <p class="chart-subtitle">Calculated user lifecycle conversion ratios</p>
+                            </div>
+                        </div>
+                        <div class="chart-body">
+                            <div class="funnel-steps">
+                                <div class="funnel-step-card">
+                                    <div class="step-title">New Registrations</div>
+                                    <div class="step-val" id="funnel-new-users">0</div>
+                                    <div class="step-rate">100%</div>
+                                </div>
+                                <div class="funnel-step-card">
+                                    <div class="step-title">Trial Started</div>
+                                    <div class="step-val" id="funnel-trial-users">0</div>
+                                    <div class="step-rate" id="funnel-trial-rate">0%</div>
+                                </div>
+                                <div class="funnel-step-card">
+                                    <div class="step-title">Paid Premium</div>
+                                    <div class="step-val" id="funnel-paid-users">0</div>
+                                    <div class="step-rate" id="funnel-paid-rate">0%</div>
+                                </div>
+                                <div class="funnel-step-card">
+                                    <div class="step-title">Life-Time / Active</div>
+                                    <div class="step-val" id="funnel-lifetime-users">0</div>
+                                    <div class="step-rate" id="funnel-lifetime-rate">0%</div>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+
+                    <!-- USER DISTRIBUTION CHART -->
+                    <article class="chart-card users-surface-card">
+                        <div class="chart-header users-card-header">
+                            <div class="users-card-header-text">
+                                <h5><i class="fas fa-chart-pie"></i> User Distribution</h5>
+                                <p class="chart-subtitle">Real-time status breakdown</p>
+                            </div>
+                        </div>
+                        <div class="chart-body">
+                            <div class="chart-height subscription-chart-wrapper">
+                                <canvas id="subscriptionChart"></canvas>
+                                <div class="subscription-legend" id="subscription-legend"></div>
+                            </div>
+                        </div>
+                    </article>
+                </section>
+
+                <!-- PAYMENT COMMAND CENTER (DATA TABLE) -->
+                <section class="data-table-container">
+                    <div class="chart-header users-card-header" style="padding: 16px 20px; background: var(--bg-card);">
+                        <div class="users-card-header-text">
+                            <h5><i class="fas fa-money-check-dollar"></i> Payment Command Center</h5>
+                            <p class="chart-subtitle">Review & approve manual bKash/Nagad/Bank subscription requests</p>
+                        </div>
+                        <a href="payment-requests.html" class="view-all">Manage All <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                    <div style="overflow-x: auto;">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>User Name</th>
+                                    <th>Package</th>
+                                    <th>Amount</th>
+                                    <th>Method</th>
+                                    <th>TxID</th>
+                                    <th>Submitted At</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="payment-table-body">
+                                <tr>
+                                    <td colspan="8" style="text-align: center; padding: 24px; color: var(--gray-400);">Loading payment requests...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- EXPIRING SUBSCRIPTIONS & QUICK ACTIONS -->
+                <section class="charts-grid" style="margin-bottom: 24px;">
+                    
+                    <!-- EXPIRING SUBSCRIPTIONS -->
+                    <article class="chart-card users-surface-card">
+                        <div class="chart-header users-card-header">
+                            <div class="users-card-header-text">
+                                <h5><i class="fas fa-hourglass-end"></i> Subscriptions Expiring Soon</h5>
+                                <p class="chart-subtitle">Users requiring renewal within 7 days</p>
+                            </div>
+                            <a href="users.html" class="view-all">View Users <i class="fas fa-arrow-right"></i></a>
+                        </div>
+                        <div style="overflow-x: auto; max-height: 320px;">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>User</th>
+                                        <th>Shop</th>
+                                        <th>Expiry</th>
+                                        <th>Remaining</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="expiring-users-body">
+                                    <tr>
+                                        <td colspan="5" style="text-align: center; padding: 20px; color: var(--gray-400);">Checking expiring users...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </article>
+
+                    <!-- QUICK ACTIONS & SYSTEM HEALTH -->
+                    <article class="chart-card users-surface-card">
+                        <div class="chart-header users-card-header">
+                            <div class="users-card-header-text">
+                                <h5><i class="fas fa-heart-pulse"></i> System Health & Operational Status</h5>
+                                <p class="chart-subtitle">Real-time service status check</p>
+                            </div>
+                            <button class="btn btn-sm users-btn-outline" onclick="DashboardModule.checkSystemHealth()">
+                                <i class="fas fa-arrows-rotate"></i> Check Now
+                            </button>
+                        </div>
+                        <div class="status-grid" style="padding: 16px;">
+                            <div class="status-item">
+                                <div class="status-icon success" id="sh-firebase-icon"><i class="fas fa-check-circle"></i></div>
+                                <div class="status-info">
+                                    <div class="status-label">Firebase Firestore</div>
+                                    <div class="status-value" id="sh-firebase-status">Connected</div>
+                                </div>
+                            </div>
+                            <div class="status-item">
+                                <div class="status-icon success" id="sh-auth-icon"><i class="fas fa-check-circle"></i></div>
+                                <div class="status-info">
+                                    <div class="status-label">Firebase Auth</div>
+                                    <div class="status-value" id="sh-auth-status">Operational</div>
+                                </div>
+                            </div>
+                            <div class="status-item">
+                                <div class="status-icon success" id="sh-onesignal-icon"><i class="fas fa-check-circle"></i></div>
+                                <div class="status-info">
+                                    <div class="status-label">OneSignal Push</div>
+                                    <div class="status-value" id="sh-onesignal-status">Active</div>
+                                </div>
+                            </div>
+                            <div class="status-item">
+                                <div class="status-icon warning" id="sh-sms-icon"><i class="fas fa-comment-sms"></i></div>
+                                <div class="status-info">
+                                    <div class="status-label">SMS Gateway API</div>
+                                    <div class="status-value" id="sh-sms-status">BulkSMSBD</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- QUICK ACTIONS GRID -->
+                        <div style="padding: 16px; border-top: 1px solid var(--border-color);">
+                            <h6 style="font-size: 13px; font-weight: 700; color: var(--gray-600); margin-bottom: 12px;">QUICK COMMAND ACTIONS</h6>
+                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
+                                <a href="users.html" class="btn btn-sm users-btn-outline"><i class="fas fa-user-plus"></i> Users</a>
+                                <a href="packages.html" class="btn btn-sm users-btn-outline"><i class="fas fa-box"></i> Packages</a>
+                                <a href="notifications.html" class="btn btn-sm users-btn-outline"><i class="fas fa-bell"></i> Notify</a>
+                                <a href="sms-packages.html" class="btn btn-sm users-btn-outline"><i class="fas fa-sms"></i> SMS</a>
+                                <a href="tutorials.html" class="btn btn-sm users-btn-outline"><i class="fas fa-video"></i> Video</a>
+                                <a href="settings.html" class="btn btn-sm users-btn-outline"><i class="fas fa-cog"></i> Settings</a>
+                            </div>
+                        </div>
+                    </article>
+                </section>
+
+                <!-- RECENT ACTIVITY FEED -->
+                <section class="activity-feed users-surface-card" style="margin-bottom: 24px;">
+                    <div class="chart-header users-card-header">
+                        <div class="users-card-header-text">
+                            <h5><i class="fas fa-clock"></i> Recent Platform Activity</h5>
+                            <p class="chart-subtitle">Real-time user registrations, payments, and system events</p>
+                        </div>
+                    </div>
+                    <div class="activity-list" id="activity-list">
+                        <div class="activity-skeleton">
+                            <div class="skeleton-item"></div>
+                            <div class="skeleton-item"></div>
+                            <div class="skeleton-item"></div>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- CTRL + K COMMAND PALETTE MODAL -->
+    <div class="command-palette-overlay" id="command-palette">
+        <div class="command-palette-modal">
+            <div class="command-palette-search">
+                <i class="fas fa-search"></i>
+                <input type="text" id="command-search-input" placeholder="Type a command or search page (e.g. Users, Payments, SMS)..." autocomplete="off">
+                <kbd class="kbd-shortcut">ESC</kbd>
+            </div>
+            <div class="command-palette-results" id="command-palette-results">
+                <!-- Commands injected by JS -->
+            </div>
+        </div>
+    </div>
+
+    <div id="loader-container"></div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <script src="config/config.js"></script>
+    <script src="js/firebase.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/dashboard.js?v=1.0.5"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            await App.loadComponent('sidebar-container', 'components/sidebar.html');
+            await App.loadComponent('navbar-container', 'components/navbar.html');
+            await App.loadComponent('loader-container', 'components/loader.html');
+
+            const authenticated = await Auth.requireAuth();
+            if (!authenticated) return;
+
+            const profile = await Auth.getProfile();
+            if (profile) {
+                App.updateUserInfo(profile);
+                const adminNameElem = document.getElementById('admin-name');
+                if (adminNameElem) adminNameElem.textContent = profile.name || 'Super Admin';
+            }
+
+            document.getElementById('page-title').textContent = 'Executive Dashboard';
+            await DashboardModule.init();
+        });
+    </script>
+</body>
+</html>

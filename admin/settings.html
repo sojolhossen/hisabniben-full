@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Settings & Configuration Center - HisabNiben Admin</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@600;700;800&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/settings-new.css?v=1.0.3">
+    <link rel="stylesheet" href="css/responsive.css">
+    <style>
+        body { font-family: 'Hind Siliguri', 'Plus Jakarta Sans', 'Inter', sans-serif; }
+    </style>
+</head>
+<body>
+    <div class="admin-wrapper">
+        <div id="sidebar-container"></div>
+
+        <main class="main-content">
+            <div id="navbar-container"></div>
+
+            <div class="page-content users-page-bg">
+
+                <!-- GLOBAL PAGE HEADER -->
+                <header class="dashboard-header-bar">
+                    <div class="header-greeting">
+                        <h2>
+                            <i class="fas fa-cog" style="color: var(--primary);"></i> Settings & System Configuration
+                            <span class="badge" style="background:rgba(16,185,129,0.12); color:#10B981; font-size:12px; font-weight:800; padding:4px 12px; border-radius:12px; margin-left:10px;">
+                                <span class="status-dot connected"></span> System Configured
+                            </span>
+                        </h2>
+                        <p id="sync-timestamp-subtitle">Configure global app options, customer support helpline, trial periods, landing page stats, and database sync options. • Synced just now</p>
+                    </div>
+
+                    <div class="header-controls">
+                        <button class="btn btn-sm users-btn-primary" onclick="SettingsModule.saveSupportSettings()" title="Save Support Helpline Settings">
+                            <i class="fas fa-save"></i> Save Helpline Settings
+                        </button>
+
+                        <button class="btn btn-sm users-btn-outline" onclick="SettingsModule.refresh()" title="Reload Settings">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
+                </header>
+
+                <!-- 4 BENTO KPI SUMMARY CARDS -->
+                <section class="kpi-command-grid-4" aria-label="System Settings Summary">
+                    
+                    <!-- 1. SYSTEM STATUS -->
+                    <article class="kpi-card">
+                        <div class="kpi-header">
+                            <div class="kpi-icon-badge users"><i class="fas fa-server"></i></div>
+                            <div class="kpi-trend up"><i class="fas fa-check"></i> Active</div>
+                        </div>
+                        <div class="kpi-value" style="color: #10B981;">Operational</div>
+                        <div class="kpi-label">Firestore & Gateway Status</div>
+                    </article>
+
+                    <!-- 2. TRIAL DURATION -->
+                    <article class="kpi-card">
+                        <div class="kpi-header">
+                            <div class="kpi-icon-badge premium"><i class="fas fa-clock"></i></div>
+                            <div class="kpi-trend up">Free Access</div>
+                        </div>
+                        <div class="kpi-value" id="kpi-trial-days">7 Days</div>
+                        <div class="kpi-label">Auto Trial Period for Signup</div>
+                    </article>
+
+                    <!-- 3. HELPLINE CONTACT -->
+                    <article class="kpi-card">
+                        <div class="kpi-header">
+                            <div class="kpi-icon-badge revenue"><i class="fas fa-headset"></i></div>
+                            <div class="kpi-trend up">1-Tap Dial</div>
+                        </div>
+                        <div class="kpi-value" style="font-size: 20px;">Support Active</div>
+                        <div class="kpi-label">Android Support Helpline</div>
+                    </article>
+
+                    <!-- 4. DATABASE HEALTH -->
+                    <article class="kpi-card">
+                        <div class="kpi-header">
+                            <div class="kpi-icon-badge expired"><i class="fas fa-database"></i></div>
+                            <div class="kpi-trend up">Synced</div>
+                        </div>
+                        <div class="kpi-value">15 Collections</div>
+                        <div class="kpi-label">Production Firestore DB</div>
+                    </article>
+                </section>
+
+                <!-- 2-COLUMN SETTINGS GRID LAYOUT -->
+                <div class="settings-grid-layout">
+
+                    <!-- 1. CUSTOMER SUPPORT & HELPLINE SETTINGS CARD (`settings/support`) -->
+                    <section class="chart-card users-surface-card" style="border: 1.5px solid rgba(245,73,39,0.3);">
+                        <div class="chart-header users-card-header" style="background: rgba(245,73,39,0.06);">
+                            <div class="users-card-header-text">
+                                <h5><i class="fas fa-headset" style="color: var(--primary);"></i> Customer Support & Helpline Settings (`settings/support`)</h5>
+                                <p class="chart-subtitle">অ্যান্ড্রয়েড অ্যাপের কাস্টমার সাপোর্ট ফোন নম্বর, হোয়াটসঅ্যাপ ও ইমেইল সেট করুন</p>
+                            </div>
+                        </div>
+
+                        <div class="chart-body users-card-body-tight" style="padding: 20px;">
+                            <form onsubmit="SettingsModule.saveSupportSettings(event)">
+                                <div class="setting-item-row">
+                                    <div class="setting-info-box">
+                                        <div class="setting-label-title">Support Phone Number (হেল্পলাইন ফোন নম্বর)</div>
+                                        <div class="setting-desc-text">অ্যাপ থেকে ১-ট্যাপ ডায়াল করার সরাসরি কল নম্বর</div>
+                                    </div>
+                                    <div class="setting-field-wrap">
+                                        <input type="text" class="form-input" id="setting-support-phone" placeholder="01700000000" required>
+                                    </div>
+                                </div>
+
+                                <div class="setting-item-row">
+                                    <div class="setting-info-box">
+                                        <div class="setting-label-title">WhatsApp Support Number (হোয়াটসঅ্যাপ নম্বর)</div>
+                                        <div class="setting-desc-text">কাস্টমার সরাসরি হোয়াটসঅ্যাপে চ্যাট করার নম্বর</div>
+                                    </div>
+                                    <div class="setting-field-wrap">
+                                        <input type="text" class="form-input" id="setting-support-whatsapp" placeholder="01700000000">
+                                    </div>
+                                </div>
+
+                                <div class="setting-item-row">
+                                    <div class="setting-info-box">
+                                        <div class="setting-label-title">Support Email (সাপোর্ট ইমেইল)</div>
+                                        <div class="setting-desc-text">কাস্টমার সাপোর্টের ইমেইল অ্যাড্রেস</div>
+                                    </div>
+                                    <div class="setting-field-wrap">
+                                        <input type="email" class="form-input" id="setting-support-email" placeholder="support@hisabniben.com">
+                                    </div>
+                                </div>
+
+                                <div class="setting-item-row">
+                                    <div class="setting-info-box">
+                                        <div class="setting-label-title">Support Available Hours (সাপোর্ট পাওয়ার সময়)</div>
+                                        <div class="setting-desc-text">সাপোর্ট সেন্টারের কার্যঘণ্টা (যেমন: ২৪ ঘণ্টা / ১০ AM - ৮ PM)</div>
+                                    </div>
+                                    <div class="setting-field-wrap">
+                                        <input type="text" class="form-input" id="setting-support-hours" placeholder="২৪ ঘণ্টা খোলা">
+                                    </div>
+                                </div>
+
+                                <div style="margin-top: 16px; text-align: right;">
+                                    <button type="submit" class="btn users-btn-primary">
+                                        <i class="fas fa-save"></i> Save Support Settings (সাপোর্ট নম্বর সেভ করুন)
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </section>
+
+                    <!-- 2. APP & FREE TRIAL SYSTEM SETTINGS CARD (`settings/system`) -->
+                    <section class="chart-card users-surface-card">
+                        <div class="chart-header users-card-header">
+                            <div class="users-card-header-text">
+                                <h5><i class="fas fa-sliders" style="color: var(--primary);"></i> App & Free Trial System Settings (`settings/system`)</h5>
+                                <p class="chart-subtitle">নতুন রেজিস্ট্রেশনে ফ্রি ট্রায়াল মেয়াদ ও অ্যাপের পছন্দসমূহ</p>
+                            </div>
+                        </div>
+
+                        <div class="chart-body users-card-body-tight" style="padding: 20px;">
+                            <form onsubmit="SettingsModule.saveSystemSettings(event)">
+                                <div class="setting-item-row">
+                                    <div class="setting-info-box">
+                                        <div class="setting-label-title">Application Name</div>
+                                        <div class="setting-desc-text">বর্তমান অ্যাপ্লিকেশনের নাম</div>
+                                    </div>
+                                    <div class="setting-field-wrap">
+                                        <input type="text" class="form-input" id="setting-app-name" value="HisabNiben" required>
+                                    </div>
+                                </div>
+
+                                <div class="setting-item-row">
+                                    <div class="setting-info-box">
+                                        <div class="setting-label-title">Currency Symbol</div>
+                                        <div class="setting-desc-text">টাকা লেনদেনের প্রধান কারেন্সি সিম্বল</div>
+                                    </div>
+                                    <div class="setting-field-wrap">
+                                        <input type="text" class="form-input" id="setting-currency" value="৳" required>
+                                    </div>
+                                </div>
+
+                                <div class="setting-item-row">
+                                    <div class="setting-info-box">
+                                        <div class="setting-label-title">Default Trial Duration (Days)</div>
+                                        <div class="setting-desc-text">নতুন ইউজার রেজিস্ট্রেশন করলে অটোমেটিক যত দিন ফ্রী ট্রায়াল পাবে (সার্ভার কন্ট্রোলড)</div>
+                                    </div>
+                                    <div class="setting-field-wrap">
+                                        <input type="number" class="form-input" id="setting-trial-days" value="7" min="1" required>
+                                    </div>
+                                </div>
+
+                                <div style="margin-top: 16px; text-align: right;">
+                                    <button type="submit" class="btn users-btn-primary">
+                                        <i class="fas fa-save"></i> Save System Settings (ট্রায়াল মোট সেভ করুন)
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </section>
+
+                    <!-- 3. LANDING PAGE & MARKETING STATS CARD (`settings/landingPage`) -->
+                    <section class="chart-card users-surface-card">
+                        <div class="chart-header users-card-header">
+                            <div class="users-card-header-text">
+                                <h5><i class="fas fa-globe" style="color: var(--primary);"></i> Landing Page Stats (`settings/landingPage`)</h5>
+                                <p class="chart-subtitle">ল্যান্ডিং পেজ হেডার এবং গ্রাহক ও ট্রানজেকশন পরিসংখ্যান</p>
+                            </div>
+                        </div>
+
+                        <div class="chart-body users-card-body-tight" style="padding: 20px;">
+                            <form onsubmit="SettingsModule.saveLandingPageSettings(event)">
+                                <div class="setting-item-row">
+                                    <div class="setting-info-box">
+                                        <div class="setting-label-title">Hero Title</div>
+                                        <div class="setting-desc-text">ল্যান্ডিং পেজের প্রধান শিরোনাম</div>
+                                    </div>
+                                    <div class="setting-field-wrap">
+                                        <input type="text" class="form-input" id="lp-hero-title" value="Smart Accounting For Rice Merchants">
+                                    </div>
+                                </div>
+
+                                <div class="setting-item-row">
+                                    <div class="setting-info-box">
+                                        <div class="setting-label-title">Hero Subtitle</div>
+                                        <div class="setting-desc-text">সাব-টাইটেল বার্তা</div>
+                                    </div>
+                                    <div class="setting-field-wrap">
+                                        <input type="text" class="form-input" id="lp-hero-subtitle" value="Track customers, manage rice transactions...">
+                                    </div>
+                                </div>
+
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px;">
+                                    <div>
+                                        <label style="font-size: 11px; font-weight: 700; color: var(--gray-500);">Stats Users</label>
+                                        <input type="text" class="form-input" id="lp-stats-users" value="10K+">
+                                    </div>
+                                    <div>
+                                        <label style="font-size: 11px; font-weight: 700; color: var(--gray-500);">Stats Customers</label>
+                                        <input type="text" class="form-input" id="lp-stats-customers" value="50K+">
+                                    </div>
+                                    <div>
+                                        <label style="font-size: 11px; font-weight: 700; color: var(--gray-500);">Stats Transactions</label>
+                                        <input type="text" class="form-input" id="lp-stats-trans" value="1M+">
+                                    </div>
+                                    <div>
+                                        <label style="font-size: 11px; font-weight: 700; color: var(--gray-500);">App Rating</label>
+                                        <input type="text" class="form-input" id="lp-stats-rating" value="4.8">
+                                    </div>
+                                </div>
+
+                                <div style="margin-top: 16px; text-align: right;">
+                                    <button type="submit" class="btn users-btn-primary">
+                                        <i class="fas fa-save"></i> Save Landing Page
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </section>
+
+                    <!-- 4. ADMIN ACCOUNT & SECURITY CARD -->
+                    <section class="chart-card users-surface-card">
+                        <div class="chart-header users-card-header">
+                            <div class="users-card-header-text">
+                                <h5><i class="fas fa-user-shield" style="color: var(--primary);"></i> Admin Account Security</h5>
+                                <p class="chart-subtitle">সুপার এডমিন একাউন্ট ও পাসওয়ার্ড রিসেট সেটিংস</p>
+                            </div>
+                        </div>
+
+                        <div class="chart-body users-card-body-tight" style="padding: 20px;">
+                            <div class="setting-item-row">
+                                <div class="setting-info-box">
+                                    <div class="setting-label-title">Admin Email</div>
+                                    <div class="setting-desc-text">বর্তমান লগইন করা এডমিন ইমেইল</div>
+                                </div>
+                                <div class="setting-field-wrap">
+                                    <span id="admin-email-display" style="font-weight: 800; color: var(--dark);">Loading...</span>
+                                </div>
+                            </div>
+
+                            <div class="setting-item-row">
+                                <div class="setting-info-box">
+                                    <div class="setting-label-title">Last Login Time</div>
+                                    <div class="setting-desc-text">সর্বশেষ লগইনের সময়</div>
+                                </div>
+                                <div class="setting-field-wrap">
+                                    <span id="last-login-display" style="font-weight: 700; color: var(--gray-500);">-</span>
+                                </div>
+                            </div>
+
+                            <div style="margin-top: 16px;">
+                                <button type="button" class="btn users-btn-outline" onclick="SettingsModule.changePassword()">
+                                    <i class="fas fa-key"></i> Send Password Reset Email
+                                </button>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- 5. FIREBASE HEALTH STATUS CARD -->
+                    <section class="chart-card users-surface-card">
+                        <div class="chart-header users-card-header">
+                            <div class="users-card-header-text">
+                                <h5><i class="fas fa-database" style="color: var(--primary);"></i> Firebase Connectivity Status</h5>
+                                <p class="chart-subtitle">ক্লাউড ডাটাবেজ ও সার্ভিস হেলথ স্ট্যাটাস</p>
+                            </div>
+                        </div>
+
+                        <div class="chart-body users-card-body-tight" style="padding: 20px;">
+                            <div class="setting-item-row">
+                                <div class="setting-info-box">
+                                    <div class="setting-label-title">Firestore Connection</div>
+                                    <div class="setting-desc-text">রিয়েল-টাইম ডাটাবেজ স্থিতি</div>
+                                </div>
+                                <span class="badge" style="background: rgba(16,185,129,0.15); color: #10B981; font-weight: 800; padding: 4px 10px; border-radius: 8px;">
+                                    <i class="fas fa-check-circle"></i> CONNECTED
+                                </span>
+                            </div>
+
+                            <div class="setting-item-row">
+                                <div class="setting-info-box">
+                                    <div class="setting-label-title">Authentication Service</div>
+                                    <div class="setting-desc-text">ইউজার ও এডমিন অথেন্টিকেশন</div>
+                                </div>
+                                <span class="badge" style="background: rgba(16,185,129,0.15); color: #10B981; font-weight: 800; padding: 4px 10px; border-radius: 8px;">
+                                    <i class="fas fa-check-circle"></i> ACTIVE
+                                </span>
+                            </div>
+
+                            <div class="setting-item-row">
+                                <div class="setting-info-box">
+                                    <div class="setting-label-title">Cloud Messaging (FCM)</div>
+                                    <div class="setting-desc-text">পুশ নোটিফিকেশন গেটওয়ে</div>
+                                </div>
+                                <span class="badge" style="background: rgba(16,185,129,0.15); color: #10B981; font-weight: 800; padding: 4px 10px; border-radius: 8px;">
+                                    <i class="fas fa-check-circle"></i> OPERATIONAL
+                                </span>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- 6. DATA BACKUP EXPORTER CARD -->
+                    <section class="chart-card users-surface-card" style="border: 1.5px solid rgba(239,68,68,0.3);">
+                        <div class="chart-header users-card-header" style="background: rgba(239,68,68,0.06);">
+                            <div class="users-card-header-text">
+                                <h5><i class="fas fa-download" style="color: var(--danger);"></i> Database Backup & Exporter</h5>
+                                <p class="chart-subtitle">ফায়ারস্টোর ডাটাবেজ ব্যাকআপ ও এক্সপোর্ট</p>
+                            </div>
+                        </div>
+
+                        <div class="chart-body users-card-body-tight" style="padding: 20px;">
+                            <div class="setting-item-row">
+                                <div class="setting-info-box">
+                                    <div class="setting-label-title">Export Database Backup</div>
+                                    <div class="setting-desc-text">ইউজার ও প্যাকেজের ব্যাকআপ ফাইল ডেসটপে ডাউনলোড করুন</div>
+                                </div>
+                                <button type="button" class="btn users-btn-outline" style="color: var(--dark);" onclick="SettingsModule.exportAllData()">
+                                    <i class="fas fa-download"></i> Export JSON Backup
+                                </button>
+                            </div>
+                        </div>
+                    </section>
+
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <div id="loader-container"></div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <script src="config/config.js"></script>
+    <script src="js/firebase.js"></script>
+    <script src="js/utils.js?v=1.0.2"></script>
+    <script src="js/main.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/settings.js?v=1.0.1"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            await App.loadComponent('sidebar-container', 'components/sidebar.html');
+            await App.loadComponent('navbar-container', 'components/navbar.html');
+            await App.loadComponent('loader-container', 'components/loader.html');
+
+            const authenticated = await Auth.requireAuth();
+            if (!authenticated) return;
+
+            const profile = await Auth.getProfile();
+            if (profile) {
+                App.updateUserInfo(profile);
+            }
+
+            const pageTitle = document.getElementById('page-title');
+            if (pageTitle) pageTitle.textContent = 'System Settings & Configuration Center';
+
+            if (typeof SettingsModule !== 'undefined') {
+                await SettingsModule.init();
+            }
+        });
+    </script>
+</body>
+</html>

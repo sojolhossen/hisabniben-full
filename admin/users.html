@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Users & CRM Management - HisabNiben Admin</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
+
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/users.css">
+    <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+    <div class="admin-wrapper">
+        <div id="sidebar-container"></div>
+
+        <main class="main-content">
+            <div id="navbar-container"></div>
+
+            <div class="page-content users-page-bg">
+                
+                <!-- HEADER & ACTIONS BAR -->
+                <header class="dashboard-header-bar">
+                    <div class="header-greeting">
+                        <h2><i class="fas fa-users-gear" style="color: var(--primary);"></i> Users Management & CRM</h2>
+                        <p id="sync-timestamp-subtitle">Manage all HisabNiben users, subscriptions, SMS balance and account activity. • Synced just now</p>
+                    </div>
+
+                    <div class="header-controls">
+                        <button class="btn btn-sm users-btn-outline" onclick="UsersModule.exportCSV()" title="Export Users CSV">
+                            <i class="fas fa-file-csv"></i> Export CSV
+                        </button>
+
+                        <button class="btn btn-sm users-btn-outline" onclick="UsersModule.refresh()" title="Reload Data">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+
+                        <button class="btn btn-sm users-btn-primary" onclick="UsersModule.openAddUserModal()">
+                            <i class="fas fa-user-plus"></i> Add User
+                        </button>
+                    </div>
+                </header>
+
+                <!-- 6 KPI SUMMARY COMMAND CARDS -->
+                <section class="kpi-command-grid" aria-label="Users KPI Summary">
+                    
+                    <!-- 1. TOTAL USERS -->
+                    <article class="kpi-card" onclick="UsersModule.applyStatusFilter('all')">
+                        <div class="kpi-header">
+                            <div class="kpi-icon-badge users"><i class="fas fa-users"></i></div>
+                            <div class="kpi-trend up"><i class="fas fa-database"></i> Live</div>
+                        </div>
+                        <div class="kpi-value" id="total-users-count">0</div>
+                        <div class="kpi-label">Total Registered Users</div>
+                    </article>
+
+                    <!-- 2. ACTIVE PREMIUM -->
+                    <article class="kpi-card" onclick="UsersModule.applyStatusFilter('premium')">
+                        <div class="kpi-header">
+                            <div class="kpi-icon-badge premium"><i class="fas fa-crown"></i></div>
+                            <div class="kpi-trend up"><i class="fas fa-check"></i> Active</div>
+                        </div>
+                        <div class="kpi-value" id="premium-users-count">0</div>
+                        <div class="kpi-label">Active Premium Users</div>
+                    </article>
+
+                    <!-- 3. ACTIVE TRIAL -->
+                    <article class="kpi-card" onclick="UsersModule.applyStatusFilter('trial')">
+                        <div class="kpi-header">
+                            <div class="kpi-icon-badge trial"><i class="fas fa-flask"></i></div>
+                            <div class="kpi-trend neutral">7-Days</div>
+                        </div>
+                        <div class="kpi-value" id="trial-users-count">0</div>
+                        <div class="kpi-label">Active Trial Users</div>
+                    </article>
+
+                    <!-- 4. EXPIRED -->
+                    <article class="kpi-card" onclick="UsersModule.applyStatusFilter('expired')">
+                        <div class="kpi-header">
+                            <div class="kpi-icon-badge expired"><i class="fas fa-clock-rotate-left"></i></div>
+                            <div class="kpi-trend down"><i class="fas fa-hourglass-end"></i> Expired</div>
+                        </div>
+                        <div class="kpi-value" id="expired-users-count">0</div>
+                        <div class="kpi-label">Expired Accounts</div>
+                    </article>
+
+                    <!-- 5. BLOCKED -->
+                    <article class="kpi-card" onclick="UsersModule.applyStatusFilter('blocked')">
+                        <div class="kpi-header">
+                            <div class="kpi-icon-badge pending"><i class="fas fa-ban"></i></div>
+                            <div class="kpi-trend down">Restricted</div>
+                        </div>
+                        <div class="kpi-value" id="blocked-users-count">0</div>
+                        <div class="kpi-label">Blocked Accounts</div>
+                    </article>
+
+                    <!-- 6. SMS BALANCE -->
+                    <article class="kpi-card" onclick="UsersModule.applySmsFilter('has_sms')">
+                        <div class="kpi-header">
+                            <div class="kpi-icon-badge sms"><i class="fas fa-comment-dots"></i></div>
+                            <div class="kpi-trend neutral">Credits</div>
+                        </div>
+                        <div class="kpi-value" id="total-sms-count">0</div>
+                        <div class="kpi-label">System SMS Credits</div>
+                    </article>
+                </section>
+
+                <!-- SEARCH & EXPANDABLE ADVANCED FILTER PANEL -->
+                <section class="chart-card users-surface-card users-filter-card" style="margin-bottom: 24px;">
+                    <div class="chart-header users-card-header">
+                        <div class="users-card-header-text">
+                            <h5><i class="fas fa-magnifying-glass"></i> Global Search & Advanced Filters</h5>
+                            <p class="chart-subtitle">Search debounced by Name, Phone, Email, Store Name, or Firebase UID</p>
+                        </div>
+                        <div class="chart-actions">
+                            <button type="button" class="btn btn-sm users-btn-outline" onclick="UsersModule.toggleAdvancedFilters()">
+                                <i class="fas fa-sliders"></i> <span id="btn-toggle-filters-text">Advanced Filters</span>
+                            </button>
+                            <button type="button" class="btn btn-sm users-btn-clear" id="clear-filters" onclick="UsersModule.resetFilters()">
+                                <i class="fas fa-times"></i> Reset
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="chart-body users-card-body-tight">
+                        <div class="search-filter-wrapper users-filter-row">
+                            <div class="search-container users-search-wide" style="flex: 1;">
+                                <i class="fas fa-search search-icon"></i>
+                                <input type="text" class="search-input" placeholder="Type to search Name, Phone, Email, Store, or UID..." id="search-users" autocomplete="off">
+                            </div>
+                        </div>
+
+                        <!-- EXPANDABLE ADVANCED FILTERS CONTAINER -->
+                        <div id="advanced-filters-panel" style="display: none; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border-color);">
+                            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px;">
+                                <div>
+                                    <label style="font-size: 11px; font-weight: 700; color: var(--gray-500); text-transform: uppercase;">Subscription Status</label>
+                                    <select class="form-input" id="filter-status" onchange="UsersModule.applyFilters()">
+                                        <option value="all">All Statuses</option>
+                                        <option value="premium">Active Premium</option>
+                                        <option value="trial">Active Trial</option>
+                                        <option value="expired">Expired</option>
+                                        <option value="free">Free / Never Paid</option>
+                                        <option value="blocked">Blocked</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label style="font-size: 11px; font-weight: 700; color: var(--gray-500); text-transform: uppercase;">SMS Balance</label>
+                                    <select class="form-input" id="filter-sms" onchange="UsersModule.applyFilters()">
+                                        <option value="all">All SMS Balances</option>
+                                        <option value="has_sms">Has SMS (>0)</option>
+                                        <option value="zero_sms">Zero SMS (0)</option>
+                                        <option value="low_sms">Low SMS (&lt;50)</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label style="font-size: 11px; font-weight: 700; color: var(--gray-500); text-transform: uppercase;">Joined Date</label>
+                                    <select class="form-input" id="filter-joined" onchange="UsersModule.applyFilters()">
+                                        <option value="all">All Time</option>
+                                        <option value="today">Joined Today</option>
+                                        <option value="7d">Last 7 Days</option>
+                                        <option value="30d">Last 30 Days</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label style="font-size: 11px; font-weight: 700; color: var(--gray-500); text-transform: uppercase;">Expiry Window</label>
+                                    <select class="form-input" id="filter-expiry" onchange="UsersModule.applyFilters()">
+                                        <option value="all">Any Expiry</option>
+                                        <option value="exp_today">Expires Today</option>
+                                        <option value="exp_3d">Expires in 3 Days</option>
+                                        <option value="exp_7d">Expires in 7 Days</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ACTIVE FILTER CHIPS -->
+                        <div id="active-filter-chips" style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px;"></div>
+                    </div>
+                </section>
+
+                <!-- DIRECTORY TABLE / GRID VIEW CONTAINER -->
+                <section class="chart-card users-surface-card users-table-card">
+                    <div class="chart-header users-card-header users-table-header">
+                        <div class="users-card-header-text">
+                            <h5><i class="fas fa-table"></i> User Directory</h5>
+                            <p class="chart-subtitle" id="showing-count">Showing 0 users</p>
+                        </div>
+                        <div class="chart-actions">
+                            <button type="button" class="btn users-view-toggle" id="toggle-view" onclick="UsersModule.toggleView()">
+                                <i class="fas fa-th" id="view-toggle-icon"></i>
+                                <span id="view-toggle-text">Grid view</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- TABLE VIEW CONTAINER -->
+                    <div class="chart-body users-table-body" id="table-view-container">
+                        <div class="table-container users-table-scroll" style="overflow-x: auto;">
+                            <table id="users-table" class="data-table-modern users-data-table" style="width:100%">
+                                <thead>
+                                    <tr>
+                                        <th width="4%"><input type="checkbox" id="select-all-users" title="Select all" onclick="UsersModule.toggleSelectAll(this)"></th>
+                                        <th width="20%">User</th>
+                                        <th width="15%">Shop / Business</th>
+                                        <th width="12%">Phone</th>
+                                        <th width="10%">Status</th>
+                                        <th width="10%">SMS Balance</th>
+                                        <th width="12%">Subscription Expiry</th>
+                                        <th width="9%">Joined</th>
+                                        <th width="8%">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="users-tbody">
+                                    <tr>
+                                        <td colspan="9" style="text-align: center; padding: 30px; color: var(--gray-400);">
+                                            <div class="spinner" style="margin: 0 auto 10px auto;"></div>
+                                            Loading user directory...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- GRID CARD VIEW CONTAINER (HIDDEN BY DEFAULT) -->
+                    <div id="grid-view-container" style="display: none;" class="users-grid-container">
+                        <!-- Rendered by JS -->
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- RIGHT-SIDE SLIDING CRM USER DETAIL DRAWER (600px) -->
+    <div class="crm-drawer-overlay" id="crm-drawer-overlay">
+        <div class="crm-drawer-shell">
+            <!-- DRAWER HEADER -->
+            <div class="crm-drawer-header">
+                <div class="crm-user-profile-summary">
+                    <div class="crm-user-avatar" id="drawer-user-avatar">U</div>
+                    <div class="crm-user-meta">
+                        <h4 id="drawer-user-name">User Name</h4>
+                        <p id="drawer-user-shop">Shop Name • 01700000000</p>
+                    </div>
+                </div>
+                <button type="button" class="modal-close" onclick="UsersModule.closeCrmDrawer()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <!-- DRAWER TABS NAVBAR -->
+            <div class="crm-drawer-tabs">
+                <button class="crm-tab-btn active" onclick="UsersModule.switchCrmTab('overview', this)"><i class="fas fa-chart-pie"></i> Overview</button>
+                <button class="crm-tab-btn" onclick="UsersModule.switchCrmTab('customers', this)"><i class="fas fa-users"></i> Customers (<span id="crm-badge-cust-count">0</span>)</button>
+                <button class="crm-tab-btn" onclick="UsersModule.switchCrmTab('suppliers', this)"><i class="fas fa-truck-field"></i> Mahajon (<span id="crm-badge-supp-count">0</span>)</button>
+                <button class="crm-tab-btn" onclick="UsersModule.switchCrmTab('subscription', this)"><i class="fas fa-crown"></i> Subscription</button>
+                <button class="crm-tab-btn" onclick="UsersModule.switchCrmTab('payments', this)"><i class="fas fa-receipt"></i> Payments</button>
+                <button class="crm-tab-btn" onclick="UsersModule.switchCrmTab('sms', this)"><i class="fas fa-comment-dots"></i> SMS</button>
+            </div>
+
+            <!-- DRAWER BODY CONTENT -->
+            <div class="crm-drawer-body">
+                
+                <!-- TAB 1: OVERVIEW & CRM BUSINESS INSIGHTS -->
+                <div class="crm-tab-content active" id="crm-tab-overview">
+                    
+                    <!-- 6 BENTO BUSINESS INSIGHT CARDS -->
+                    <div class="crm-insights-grid" style="grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px;">
+                        <div class="crm-insight-card" style="text-align: left; padding: 14px; background: var(--bg-card);">
+                            <div class="lbl"><i class="fas fa-users" style="color: var(--primary);"></i> Total Customers</div>
+                            <div class="val" id="crm-stat-cust-count" style="color: var(--primary); font-size: 17px;">0 জন</div>
+                            <div style="font-size: 11.5px; font-weight: 700; color: var(--danger); margin-top: 4px;">মোট বকেয়া: <span id="crm-stat-dues">৳0</span></div>
+                        </div>
+
+                        <div class="crm-insight-card" style="text-align: left; padding: 14px; background: var(--bg-card);">
+                            <div class="lbl"><i class="fas fa-truck-field" style="color: #6366F1;"></i> Mahajon / Suppliers</div>
+                            <div class="val" id="crm-stat-supp-count" style="color: #6366F1; font-size: 17px;">0 জন</div>
+                            <div style="font-size: 11.5px; font-weight: 700; color: var(--warning); margin-top: 4px;">মোট পাওনা: <span id="crm-stat-payables">৳0</span></div>
+                        </div>
+
+                        <div class="crm-insight-card" style="text-align: left; padding: 14px; background: var(--bg-card);">
+                            <div class="lbl"><i class="fas fa-boxes-stacked" style="color: #F59E0B;"></i> Stock Varieties</div>
+                            <div class="val" id="crm-stat-stock" style="color: #F59E0B; font-size: 17px;">0 প্রকার</div>
+                            <div style="font-size: 11.5px; color: var(--gray-500); margin-top: 4px;">চালের স্টক তালিকা</div>
+                        </div>
+
+                        <div class="crm-insight-card" style="text-align: left; padding: 14px; background: var(--bg-card);">
+                            <div class="lbl"><i class="fas fa-sack-dollar" style="color: #10B981;"></i> Total Sales</div>
+                            <div class="val" id="crm-stat-sales" style="color: #10B981; font-size: 17px;">৳0</div>
+                            <div style="font-size: 11.5px; color: var(--gray-500); margin-top: 4px;">চাল বিক্রি এন্ট্রি</div>
+                        </div>
+
+                        <div class="crm-insight-card" style="text-align: left; padding: 14px; background: var(--bg-card);">
+                            <div class="lbl"><i class="fas fa-cart-shopping" style="color: #0EA5E9;"></i> Total Purchases</div>
+                            <div class="val" id="crm-stat-purchases" style="color: #0EA5E9; font-size: 17px;">৳0</div>
+                            <div style="font-size: 11.5px; color: var(--gray-500); margin-top: 4px;">মহাজন স্টক ক্রয়</div>
+                        </div>
+
+                        <div class="crm-insight-card" style="text-align: left; padding: 14px; background: var(--bg-card);">
+                            <div class="lbl"><i class="fas fa-list-check" style="color: var(--dark);"></i> Transactions</div>
+                            <div class="val" id="crm-stat-tx-count" style="color: var(--dark); font-size: 17px;">0 টি</div>
+                            <div style="font-size: 11.5px; color: var(--gray-500); margin-top: 4px;">হিসাব খাতা এন্ট্রি</div>
+                        </div>
+                    </div>
+
+                    <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 18px; margin-bottom: 16px;">
+                        <h6 style="font-size: 13px; font-weight: 700; color: var(--gray-600); margin-bottom: 12px;">USER INFORMATION</h6>
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; font-size: 13px;">
+                            <div><span style="color: var(--gray-500);">Full Name:</span> <strong id="crm-info-name">-</strong></div>
+                            <div><span style="color: var(--gray-500);">Phone:</span> <strong id="crm-info-phone">-</strong></div>
+                            <div><span style="color: var(--gray-500);">Email:</span> <strong id="crm-info-email">-</strong></div>
+                            <div><span style="color: var(--gray-500);">Store Name:</span> <strong id="crm-info-store">-</strong></div>
+                            <div style="grid-column: 1 / -1;"><span style="color: var(--gray-500);">Firebase UID:</span> <code id="crm-info-uid" style="font-size: 11px;">-</code></div>
+                            <div><span style="color: var(--gray-500);">Account Status:</span> <span id="crm-info-account-status" class="status-badge approved">Active</span></div>
+                            <div><span style="color: var(--gray-500);">Registered On:</span> <strong id="crm-info-joined">-</strong></div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 8px; margin-top: 20px; flex-wrap: wrap;">
+                        <button class="btn btn-sm users-btn-primary" onclick="UsersModule.openEditModalFromDrawer()"><i class="fas fa-edit"></i> Edit Profile</button>
+                        <button class="btn btn-sm users-btn-outline" onclick="UsersModule.openSmsModalFromDrawer()"><i class="fas fa-comment-dots"></i> Add SMS</button>
+                        <button class="btn btn-sm users-btn-outline" id="btn-drawer-ban" onclick="UsersModule.toggleBanFromDrawer()"><i class="fas fa-ban"></i> Ban User</button>
+                        <button class="btn btn-sm" style="background:#EF4444; color:white; border:none;" onclick="UsersModule.openDeleteUserModalFromDrawer()"><i class="fas fa-trash-alt"></i> Delete Account</button>
+                    </div>
+                </div>
+
+                <!-- TAB 2: CUSTOMERS LIST -->
+                <div class="crm-tab-content" id="crm-tab-customers">
+                    <h6 style="font-size: 13px; font-weight: 700; color: var(--gray-600); margin-bottom: 12px;">CUSTOMER DIRECTORY (কাস্টমার তালিকা)</h6>
+                    <div id="crm-customers-list" style="font-size: 13px;">Loading customers...</div>
+                </div>
+
+                <!-- TAB 3: MAHAJON / SUPPLIERS LIST -->
+                <div class="crm-tab-content" id="crm-tab-suppliers">
+                    <h6 style="font-size: 13px; font-weight: 700; color: var(--gray-600); margin-bottom: 12px;">MAHAJON DIRECTORY (মহাজন তালিকা)</h6>
+                    <div id="crm-suppliers-list" style="font-size: 13px;">Loading mahajon list...</div>
+                </div>
+
+                <!-- TAB 2: SUBSCRIPTION CONTROL -->
+                <div class="crm-tab-content" id="crm-tab-subscription">
+                    <div style="background: var(--gray-50); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 18px; margin-bottom: 16px;">
+                        <h6 style="font-size: 13px; font-weight: 700; color: var(--gray-600); margin-bottom: 12px;">ACTIVE SUBSCRIPTION STATUS</h6>
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; font-size: 13px;">
+                            <div><span style="color: var(--gray-500);">Status:</span> <span id="crm-sub-status-badge" class="status-badge approved">ACTIVE</span></div>
+                            <div><span style="color: var(--gray-500);">Current Package:</span> <strong id="crm-sub-package-name">Premium</strong></div>
+                            <div><span style="color: var(--gray-500);">Expiry Date:</span> <strong id="crm-sub-expiry-date">-</strong></div>
+                            <div><span style="color: var(--gray-500);">Remaining Days:</span> <strong id="crm-sub-remaining-days" style="color: var(--primary);">-</strong></div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <button class="btn btn-primary" onclick="UsersModule.openSubscriptionModal()"><i class="fas fa-crown"></i> Grant / Extend Subscription</button>
+                    </div>
+                </div>
+
+                <!-- TAB 3: PAYMENTS HISTORY -->
+                <div class="crm-tab-content" id="crm-tab-payments">
+                    <div id="crm-payments-list" style="font-size: 13px;">Loading payment history...</div>
+                </div>
+
+                <!-- TAB 4: SMS ACTIVITY -->
+                <div class="crm-tab-content" id="crm-tab-sms">
+                    <div style="background: var(--gray-50); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 18px; margin-bottom: 16px; text-align: center;">
+                        <div style="font-size: 12px; color: var(--gray-500); font-weight: 700; text-transform: uppercase;">Available SMS Credits</div>
+                        <div id="crm-sms-balance-display" style="font-size: 28px; font-weight: 800; color: var(--primary); margin: 6px 0;">0 SMS</div>
+                        <button class="btn btn-sm users-btn-primary" onclick="UsersModule.openSmsModalFromDrawer()"><i class="fas fa-plus"></i> Update SMS Balance</button>
+                    </div>
+                </div>
+
+                <!-- TAB 5: ACTIVITY TIMELINE -->
+                <div class="crm-tab-content" id="crm-tab-activity">
+                    <div id="crm-activity-timeline" style="font-size: 13px;">Loading activity history...</div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- DELETE USER CONFIRMATION MODAL -->
+    <div class="modal-overlay" id="delete-user-modal">
+        <div class="modal-dialog users-modal-shell" style="max-width: 480px;">
+            <div class="modal-content users-modal-content">
+                <div class="modal-header users-modal-header" style="background: rgba(239, 68, 68, 0.1);">
+                    <h5 style="color: var(--danger);"><i class="fas fa-exclamation-triangle"></i> Delete Account & All User Data</h5>
+                    <button type="button" class="modal-close" onclick="UsersModule.closeDeleteUserModal()"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="modal-body users-modal-body">
+                    <input type="hidden" id="delete-user-id">
+                    
+                    <div style="background: rgba(239, 68, 68, 0.08); border-left: 4px solid var(--danger); padding: 14px; border-radius: 8px; margin-bottom: 16px;">
+                        <div style="font-weight: 800; color: var(--danger); font-size: 14px; margin-bottom: 4px;">⚠️ IRREVERSIBLE DATA PURGE</div>
+                        <div style="font-size: 13px; color: var(--dark); line-height: 1.5;">
+                            You are about to permanently delete <strong id="delete-user-name-display">User Name</strong> (<code id="delete-user-phone-display">Phone</code>).
+                        </div>
+                    </div>
+
+                    <div style="font-size: 13px; color: var(--gray-600); margin-bottom: 16px; line-height: 1.6;">
+                        <strong>The following associated user data will be permanently removed:</strong>
+                        <ul style="margin-top: 6px; padding-left: 20px; color: var(--dark-medium);">
+                            <li>User Account Profile & Settings</li>
+                            <li>All Customers & Customer Dues</li>
+                            <li>All Suppliers / Mahajon & Payables</li>
+                            <li>All Ledger Transactions & Sales</li>
+                            <li>All Products & Rice Stock</li>
+                            <li>All Payment Requests & Purchase Records</li>
+                            <li>All SMS History & Wallet Accounts</li>
+                        </ul>
+                    </div>
+
+                    <div class="form-group-modern">
+                        <label for="delete-user-confirm-input" style="font-weight: 700; color: var(--dark); font-size: 12.5px;">
+                            Type <code style="color: var(--danger); font-weight: 800;">DELETE</code> below to confirm:
+                        </label>
+                        <input type="text" class="form-input" id="delete-user-confirm-input" placeholder="Type DELETE to confirm" style="text-transform: uppercase; font-weight: 700;">
+                    </div>
+
+                    <div class="form-actions" style="margin-top: 20px; display: flex; justify-content: flex-end; gap: 10px;">
+                        <button type="button" class="btn btn-outline" onclick="UsersModule.closeDeleteUserModal()">Cancel</button>
+                        <button type="button" class="btn btn-danger" style="background: var(--danger); color: white; border: none;" onclick="UsersModule.confirmDeleteUserAndAllData()">
+                            <i class="fas fa-trash-alt"></i> Delete User & All Data
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- EDIT USER MODAL -->
+    <div class="modal-overlay" id="edit-user-modal">
+        <div class="modal-dialog users-modal-shell">
+            <div class="modal-content users-modal-content">
+                <div class="modal-header users-modal-header">
+                    <h5><i class="fas fa-user-edit"></i> Edit User Information</h5>
+                    <button type="button" class="modal-close" onclick="UsersModule.closeEditModal()"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="modal-body users-modal-body">
+                    <form id="edit-user-form">
+                        <input type="hidden" id="edit-user-id">
+                        <div class="form-grid">
+                            <div class="form-group-modern">
+                                <label for="edit-user-name"><i class="fas fa-user"></i> Full Name</label>
+                                <input type="text" class="form-input" id="edit-user-name" required>
+                            </div>
+                            <div class="form-group-modern">
+                                <label for="edit-user-phone"><i class="fas fa-phone"></i> Phone</label>
+                                <input type="tel" class="form-input" id="edit-user-phone" required>
+                            </div>
+                            <div class="form-group-modern full-width">
+                                <label for="edit-user-email"><i class="fas fa-envelope"></i> Email</label>
+                                <input type="email" class="form-input" id="edit-user-email">
+                            </div>
+                            <div class="form-group-modern full-width">
+                                <label for="edit-user-store"><i class="fas fa-store"></i> Store Name</label>
+                                <input type="text" class="form-input" id="edit-user-store">
+                            </div>
+                        </div>
+                        <div class="form-actions" style="margin-top: 20px;">
+                            <button type="button" class="btn btn-outline" onclick="UsersModule.closeEditModal()">Cancel</button>
+                            <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SUBSCRIPTION MANAGEMENT MODAL -->
+    <div class="modal-overlay" id="subscription-modal">
+        <div class="modal-dialog users-modal-shell">
+            <div class="modal-content users-modal-content">
+                <div class="modal-header users-modal-header">
+                    <h5><i class="fas fa-crown" style="color: var(--primary);"></i> Grant / Extend Subscription</h5>
+                    <button type="button" class="modal-close" onclick="UsersModule.closeSubscriptionModal()"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="modal-body users-modal-body">
+                    <form id="subscription-form">
+                        <input type="hidden" id="sub-user-id">
+                        <div class="form-group-modern">
+                            <label for="sub-package-select"><i class="fas fa-box"></i> Select Package</label>
+                            <select class="form-input" id="sub-package-select" required>
+                                <option value="30">Monthly Premium (30 Days)</option>
+                                <option value="90">Quarterly Premium (90 Days)</option>
+                                <option value="180">Half-Yearly Premium (180 Days)</option>
+                                <option value="365">Yearly Premium (365 Days)</option>
+                                <option value="999">Life-Time Membership (Life-Time)</option>
+                            </select>
+                        </div>
+                        <div class="form-group-modern" style="margin-top: 14px;">
+                            <label for="sub-reason"><i class="fas fa-comment"></i> Reason / Admin Note</label>
+                            <input type="text" class="form-input" id="sub-reason" placeholder="e.g. Manual payment received via bKash" required>
+                        </div>
+                        <div class="form-actions" style="margin-top: 20px;">
+                            <button type="button" class="btn btn-outline" onclick="UsersModule.closeSubscriptionModal()">Cancel</button>
+                            <button type="button" class="btn btn-primary" onclick="UsersModule.saveSubscription()"><i class="fas fa-save"></i> Grant Package</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- UPDATE SMS BALANCE MODAL -->
+    <div class="modal-overlay" id="update-sms-modal">
+        <div class="modal-dialog users-modal-shell">
+            <div class="modal-content users-modal-content">
+                <div class="modal-header users-modal-header">
+                    <h5><i class="fas fa-comment-dots" style="color: #3B82F6;"></i> Update SMS Balance</h5>
+                    <button type="button" class="modal-close" onclick="UsersModule.closeSmsModal()"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="modal-body users-modal-body">
+                    <form id="update-sms-form">
+                        <input type="hidden" id="sms-user-id">
+                        <div class="form-group-modern">
+                            <label for="sms-action-type"><i class="fas fa-cog"></i> Action Type</label>
+                            <select class="form-input" id="sms-action-type" onchange="UsersModule.updateSmsLabels()">
+                                <option value="add">Add SMS (+)</option>
+                                <option value="set">Set Exact Balance (=)</option>
+                                <option value="remove">Remove SMS (-)</option>
+                            </select>
+                        </div>
+                        <div class="form-group-modern" style="margin-top: 14px;">
+                            <label for="sms-amount-input"><i class="fas fa-sms"></i> Amount</label>
+                            <input type="number" class="form-input" id="sms-amount-input" min="1" placeholder="Enter number of SMS credits" required>
+                        </div>
+                        <div class="form-actions" style="margin-top: 20px;">
+                            <button type="button" class="btn btn-outline" onclick="UsersModule.closeSmsModal()">Cancel</button>
+                            <button type="button" class="btn btn-primary" onclick="UsersModule.saveSmsBalance()"><i class="fas fa-save"></i> Update SMS</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="loader-container"></div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <script src="config/config.js"></script>
+    <script src="js/firebase.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/users.js?v=1.0.6"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            await App.loadComponent('sidebar-container', 'components/sidebar.html');
+            await App.loadComponent('navbar-container', 'components/navbar.html');
+            await App.loadComponent('loader-container', 'components/loader.html');
+
+            const authenticated = await Auth.requireAuth();
+            if (!authenticated) return;
+
+            const profile = await Auth.getProfile();
+            if (profile) {
+                App.updateUserInfo(profile);
+            }
+
+            document.getElementById('page-title').textContent = 'Users & CRM';
+            await UsersModule.init();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">HisabNiben</string>
+    <string name="app_tagline">Manage Your Baki Easily</string>
+    
+    <!-- Login -->
+    <string name="login_signup">Login / Sign Up</string>
+    <string name="full_name">Full Name</string>
+    <string name="phone_number">Phone Number</string>
+    <string name="verification_code">Verification Code</string>
+    <string name="send_verification_code">Send Verification Code</string>
+    <string name="verify_login">Verify &amp; Login</string>
+    <string name="resend_code_in">Resend code in %d seconds</string>
+    <string name="resend_code">Resend Code</string>
+    
+    <!-- Dashboard -->
+    <string name="dashboard">Dashboard</string>
+    <string name="customers">Customers</string>
+    <string name="transactions">Transactions</string>
+    <string name="total_baki">Total Baki</string>
+    <string name="total_customers">Total Customers</string>
+    <string name="total_transactions">Total Transactions</string>
+    
+    <!-- Customer -->
+    <string name="add_customer">Add Customer</string>
+    <string name="edit_customer">Edit Customer</string>
+    <string name="customer_name">Customer Name</string>
+    <string name="customer_phone">Phone Number</string>
+    <string name="customer_address">Address</string>
+    <string name="customer_baki">Baki (Due)</string>
+    <string name="delete_customer">Delete Customer</string>
+    <string name="delete_customer_confirm">Are you sure you want to delete this customer?</string>
+    
+    <!-- Transaction -->
+    <string name="add_transaction">Add Transaction</string>
+    <string name="edit_transaction">Edit Transaction</string>
+    <string name="select_customer">Select Customer</string>
+    <string name="transaction_type">Transaction Type</string>
+    <string name="payment">Payment</string>
+    <string name="baki">Baki (Due)</string>
+    <string name="amount">Amount</string>
+    <string name="note">Note (Optional)</string>
+    <string name="delete_transaction">Delete Transaction</string>
+    <string name="delete_transaction_confirm">Are you sure you want to delete this transaction?</string>
+    
+    <!-- Subscription -->
+    <string name="subscription">Subscription</string>
+    <string name="upgrade_premium">Upgrade to Premium</string>
+    <string name="trial_remaining">Trial: %d days remaining</string>
+    <string name="premium_active">Premium: %d days remaining</string>
+    <string name="subscription_expired">Subscription Expired</string>
+    <string name="trial_expired">Trial Expired</string>
+    <string name="subscribe_now">Subscribe Now</string>
+    
+    <!-- Premium Features -->
+    <string name="premium_feature">Premium Feature</string>
+    <string name="upgrade_for_full_access">Upgrade to Premium for full access</string>
+    <string name="trial_limit_reached">Trial Limit Reached</string>
+    <string name="upgrade_to_add_more">Upgrade to Premium to add more %s</string>
+    <string name="you_can_add_only_during_trial">You can only add %d customers during trial</string>
+    
+    <!-- Common -->
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    <string name="delete">Delete</string>
+    <string name="edit">Edit</string>
+    <string name="search">Search</string>
+    <string name="filter">Filter</string>
+    <string name="refresh">Refresh</string>
+    <string name="loading">Loading...</string>
+    <string name="error">Error</string>
+    <string name="success">Success</string>
+    <string name="retry">Retry</string>
+    <string name="ok">OK</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    
+    <!-- Errors -->
+    <string name="error_empty_name">Please enter your name</string>
+    <string name="error_empty_phone">Please enter phone number</string>
+    <string name="error_invalid_phone">Please enter a valid phone number</string>
+    <string name="error_empty_otp">Please enter verification code</string>
+    <string name="error_invalid_otp">Invalid verification code</string>
+    <string name="error_otp_expired">Verification code expired</string>
+    <string name="error_network">Network error. Please try again.</string>
+    <string name="error_unknown">Something went wrong. Please try again.</string>
+    
+    <!-- Empty States -->
+    <string name="no_customers">No customers yet</string>
+    <string name="add_first_customer">Add your first customer</string>
+    <string name="no_transactions">No transactions yet</string>
+    <string name="add_first_transaction">Add your first transaction</string>
+    
+    <!-- Menu -->
+    <string name="menu_dashboard">Dashboard</string>
+    <string name="menu_customers">Customers</string>
+    <string name="menu_transactions">Transactions</string>
+    <string name="menu_reports">Reports</string>
+    <string name="menu_settings">Settings</string>
+    <string name="menu_logout">Logout</string>
+    <string name="menu_subscription">Subscription</string>
+</resources>

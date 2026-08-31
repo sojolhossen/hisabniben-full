@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise Push Notifications Center - HisabNiben Admin</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@600;700;800&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/notifications-new.css?v=1.0.5">
+    <link rel="stylesheet" href="css/responsive.css">
+    <style>
+        body { font-family: 'Hind Siliguri', 'Plus Jakarta Sans', 'Inter', sans-serif; }
+    </style>
+</head>
+<body>
+    <div class="admin-wrapper">
+        <div id="sidebar-container"></div>
+
+        <main class="main-content">
+            <div id="navbar-container"></div>
+
+            <div class="page-content users-page-bg">
+
+                <!-- GLOBAL PAGE HEADER -->
+                <header class="dashboard-header-bar">
+                    <div class="header-greeting">
+                        <h2>
+                            <i class="fas fa-bell" style="color: var(--primary);"></i> Push Notifications Center
+                            <span class="badge" style="background:rgba(16,185,129,0.12); color:#10B981; font-size:12px; font-weight:800; padding:4px 12px; border-radius:12px; margin-left:10px;">
+                                <span class="status-dot connected"></span> Push Gateway Operational
+                            </span>
+                        </h2>
+                        <p id="sync-timestamp-subtitle">Broadcast push notifications, announcements, in-app alerts, and promotional banners to rice business app users. • Synced just now</p>
+                    </div>
+
+                    <div class="header-controls">
+                        <button class="btn btn-sm users-btn-primary" onclick="document.getElementById('notification-title').focus()" title="Compose Campaign">
+                            <i class="fas fa-paper-plane"></i> Compose Campaign
+                        </button>
+
+                        <button class="btn btn-sm users-btn-outline" onclick="NotificationsModule.refresh()" title="Reload Data">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
+                </header>
+
+                <!-- 4 BENTO KPI SUMMARY CARDS -->
+                <section class="kpi-command-grid-4" aria-label="Notification Campaign Summary">
+                    
+                    <!-- 1. TOTAL SENT -->
+                    <article class="kpi-card">
+                        <div class="kpi-header">
+                            <div class="kpi-icon-badge users"><i class="fas fa-paper-plane"></i></div>
+                            <div class="kpi-trend up"><i class="fas fa-broadcast-tower"></i> All-Time</div>
+                        </div>
+                        <div class="kpi-value" id="kpi-total-sent">0</div>
+                        <div class="kpi-label">Total Sent Campaigns</div>
+                    </article>
+
+                    <!-- 2. SENT TODAY -->
+                    <article class="kpi-card">
+                        <div class="kpi-header">
+                            <div class="kpi-icon-badge premium"><i class="fas fa-calendar-day"></i></div>
+                            <div class="kpi-trend up">Today</div>
+                        </div>
+                        <div class="kpi-value" id="kpi-sent-today" style="color: #10B981;">0</div>
+                        <div class="kpi-label">Notifications Sent Today</div>
+                    </article>
+
+                    <!-- 3. ESTIMATED REACH -->
+                    <article class="kpi-card">
+                        <div class="kpi-header">
+                            <div class="kpi-icon-badge revenue"><i class="fas fa-users"></i></div>
+                            <div class="kpi-trend up">Audience</div>
+                        </div>
+                        <div class="kpi-value" id="kpi-total-reach">0</div>
+                        <div class="kpi-label">Total Registered Reach</div>
+                    </article>
+
+                    <!-- 4. ACTIVE CAMPAIGNS -->
+                    <article class="kpi-card">
+                        <div class="kpi-header">
+                            <div class="kpi-icon-badge expired"><i class="fas fa-bolt"></i></div>
+                            <div class="kpi-trend up">High Engagement</div>
+                        </div>
+                        <div class="kpi-value" id="kpi-click-rate">98.4%</div>
+                        <div class="kpi-label">Delivery Success Rate</div>
+                    </article>
+                </section>
+
+                <!-- MAIN COMPOSER & HISTORY LAYOUT GRID -->
+                <div class="notifications-layout">
+
+                    <!-- LEFT COLUMN: COMPOSE PUSH NOTIFICATION CARD -->
+                    <section class="chart-card users-surface-card">
+                        <div class="chart-header users-card-header">
+                            <div class="users-card-header-text">
+                                <h5><i class="fas fa-paper-plane" style="color: var(--primary);"></i> Compose Push Notification Campaign</h5>
+                                <p class="chart-subtitle">নোটিফিকেশনের বিষয়বস্তু, অডিয়েন্স ও ইন-অ্যাপ লিংক নির্বাচন করুন</p>
+                            </div>
+                        </div>
+
+                        <div class="chart-body users-card-body-tight" style="padding: 20px;">
+                            <form id="notification-form" onsubmit="NotificationsModule.sendNotification(event)">
+                                
+                                <!-- TARGET AUDIENCE -->
+                                <div class="form-group-modern">
+                                    <label><i class="fas fa-bullseye"></i> Select Target Audience (অডিয়েন্স নির্বাচন)</label>
+                                    <div class="target-grid">
+                                        <div class="target-card">
+                                            <input type="radio" name="target" id="target-all" value="all" checked onchange="NotificationsModule.updateAudiencePreview()">
+                                            <label for="target-all">
+                                                <div class="target-icon"><i class="fas fa-users"></i></div>
+                                                <span>সকল ইউজার (All)</span>
+                                            </label>
+                                        </div>
+                                        <div class="target-card">
+                                            <input type="radio" name="target" id="target-premium" value="premium" onchange="NotificationsModule.updateAudiencePreview()">
+                                            <label for="target-premium">
+                                                <div class="target-icon"><i class="fas fa-crown"></i></div>
+                                                <span>প্রিমিয়াম (Premium)</span>
+                                            </label>
+                                        </div>
+                                        <div class="target-card">
+                                            <input type="radio" name="target" id="target-trial" value="trial" onchange="NotificationsModule.updateAudiencePreview()">
+                                            <label for="target-trial">
+                                                <div class="target-icon"><i class="fas fa-clock"></i></div>
+                                                <span>ট্রায়াল (Trial)</span>
+                                            </label>
+                                        </div>
+                                        <div class="target-card">
+                                            <input type="radio" name="target" id="target-expired" value="expired" onchange="NotificationsModule.updateAudiencePreview()">
+                                            <label for="target-expired">
+                                                <div class="target-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                                                <span>মেয়াদউত্তীর্ণ (Expired)</span>
+                                            </label>
+                                        </div>
+                                        <div class="target-card">
+                                            <input type="radio" name="target" id="target-specific" value="specific" onchange="NotificationsModule.updateAudiencePreview()">
+                                            <label for="target-specific">
+                                                <div class="target-icon"><i class="fas fa-user-check"></i></div>
+                                                <span>নির্দিষ্ট গ্রাহক</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- SPECIFIC USER SELECT -->
+                                <div class="form-group-modern" id="specific-user-div" style="display: none;">
+                                    <label for="specific-user">
+                                        <i class="fas fa-user-check"></i> Choose Specific User (গ্রাহক নির্বাচন)
+                                    </label>
+                                    <select id="specific-user" class="form-input">
+                                        <option value="">গ্রাহক লোড হচ্ছে...</option>
+                                    </select>
+                                </div>
+
+                                <!-- TYPE & PRIORITY -->
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+                                    <div>
+                                        <label style="display: block; font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--gray-500); margin-bottom: 6px;">Notification Type (ধরন)</label>
+                                        <select id="notification-type" class="form-input" onchange="NotificationsModule.updatePreview()">
+                                            <option value="announcement">📢 সাধারণ ঘোষণা (Announcement)</option>
+                                            <option value="feature_update">⭐ নতুন ফিচার আপডেট (Feature Update)</option>
+                                            <option value="subscription">💳 সাবস্ক্রিপশন / পেমেন্ট (Subscription)</option>
+                                            <option value="promotional">🎉 অফার / প্রোমোশন (Promotional)</option>
+                                            <option value="tutorial">🎥 ভিডিও টিউটোরিয়াল (Tutorial)</option>
+                                            <option value="maintenance">🛠️ মেইনটেন্যান্স এলার্ট (Maintenance)</option>
+                                            <option value="security_alert">🔒 নিরাপত্তা এলার্ট (Security Alert)</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label style="display: block; font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--gray-500); margin-bottom: 6px;">Priority (গুরুত্ব)</label>
+                                        <select id="notification-priority" class="form-input">
+                                            <option value="normal">সাধারণ (Normal)</option>
+                                            <option value="important">গুরুত্বপূর্ণ (Important)</option>
+                                            <option value="urgent">জরুরি (Urgent Badge)</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <!-- NOTIFICATION TITLE -->
+                                <div class="form-group-modern">
+                                    <label for="notification-title">
+                                        <i class="fas fa-heading"></i> Notification Title (শিরোনাম) *
+                                    </label>
+                                    <input type="text" id="notification-title" class="form-input" placeholder="উদাহরণ: নতুন চাল বিক্রির ফিচার এসেছে" maxlength="100" oninput="NotificationsModule.updatePreview()" required>
+                                </div>
+
+                                <!-- IMAGE URL -->
+                                <div class="form-group-modern">
+                                    <label for="notification-image-url">
+                                        <i class="fas fa-image"></i> Image URL (ছবি লিংক — Optional)
+                                    </label>
+                                    <input type="url" id="notification-image-url" class="form-input" placeholder="https://example.com/banner.jpg" oninput="NotificationsModule.updatePreview()">
+                                    <small class="form-hint" style="color: var(--gray-400);">নোটিফিকেশনে আকর্ষণীয় ব্যানার ছবি দেখানোর জন্য ইমেজ লিংক দিন</small>
+                                </div>
+
+                                <!-- MESSAGE -->
+                                <div class="form-group-modern">
+                                    <label for="notification-message">
+                                        <i class="fas fa-align-left"></i> Message (বিস্তারিত বার্তা) *
+                                    </label>
+                                    <textarea id="notification-message" class="form-input form-textarea" rows="4" placeholder="এখন থেকে খুব সহজেই অ্যান্ড্রয়েড অ্যাপ থেকে..." maxlength="500" oninput="NotificationsModule.updatePreview()" required></textarea>
+                                    <div class="char-counter"><span id="char-current">0</span> / 500</div>
+                                </div>
+
+                                <!-- IN-APP ACTION & CTA TEXT -->
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+                                    <div>
+                                        <label style="display: block; font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--gray-500); margin-bottom: 6px;">In-App Action (ক্লিক করার পর অ্যাকশন)</label>
+                                        <select id="notification-action" class="form-input">
+                                            <option value="NONE">কোনো অ্যাকশন নেই (No Action)</option>
+                                            <option value="OPEN_SUBSCRIPTION">💳 সাবস্ক্রিপশন স্ক্রিন (Subscription)</option>
+                                            <option value="OPEN_SMS">💬 এসএমএস কেনা স্ক্রিন (SMS Recharge)</option>
+                                            <option value="OPEN_REPORTS">📊 রিপোর্ট ও হিসাব স্ক্রিন (Reports)</option>
+                                            <option value="OPEN_TUTORIAL">🎥 ভিডিও টিউটোরিয়াল স্ক্রিন (Tutorials)</option>
+                                            <option value="OPEN_STOCK">📦 চালের স্টক স্ক্রিন (Stock)</option>
+                                            <option value="OPEN_CUSTOMERS">👥 কাস্টমার খাতা (Customers)</option>
+                                            <option value="OPEN_TRANSACTIONS">🌾 চাল বিক্রি ও কেনা (Transactions)</option>
+                                            <option value="OPEN_URL">🌐 এক্সটার্নাল ওয়েবসাইট লিংক (Web URL)</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label style="display: block; font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--gray-500); margin-bottom: 6px;">CTA Button Text (বাটন টেক্সট)</label>
+                                        <input type="text" id="notification-cta-text" class="form-input" placeholder="ফিচারটি দেখুন / প্যাকেজ রিনিউ করুন" oninput="NotificationsModule.updatePreview()">
+                                    </div>
+                                </div>
+
+                                <div class="form-group-modern">
+                                    <label for="notification-deeplink">
+                                        <i class="fas fa-link"></i> Deep Link / Web URL (ওয়েবসাইট লিংক যদি থাকে)
+                                    </label>
+                                    <input type="url" id="notification-deeplink" class="form-input" placeholder="https://hisabniben.com">
+                                </div>
+
+                                <!-- AUDIENCE RECIPIENT COUNT -->
+                                <div class="audience-preview" id="audience-preview" style="background: var(--bg-card); border: 1.5px solid var(--border-color); border-radius: 12px; padding: 14px; display: flex; align-items: center; gap: 14px; margin-bottom: 20px;">
+                                    <div class="audience-icon" style="width: 40px; height: 40px; border-radius: 10px; background: rgba(245,73,39,0.15); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 18px;">
+                                        <i class="fas fa-users"></i>
+                                    </div>
+                                    <div class="audience-info">
+                                        <div class="audience-label" style="font-size: 12px; color: var(--gray-500);">আনুমানিক গ্রাহক সংখ্যা (Estimated Audience)</div>
+                                        <div class="audience-count" id="target-count" style="font-size: 18px; font-weight: 800; color: var(--dark);">0</div>
+                                    </div>
+                                </div>
+
+                                <!-- SUBMIT BUTTON -->
+                                <button type="submit" class="btn btn-primary btn-lg w-100" id="btn-send" style="background: linear-gradient(135deg, #F54927, #FF6B4A); border: none; padding: 14px; border-radius: 12px; font-weight: 800; font-size: 15px; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 4px 20px rgba(245,73,39,0.3);">
+                                    <i class="fas fa-paper-plane"></i> Send Push Notification (নোটিফিকেশন পাঠান)
+                                </button>
+                            </form>
+                        </div>
+                    </section>
+
+                    <!-- RIGHT COLUMN: LIVE PHONE MOCKUP PREVIEW & HISTORY -->
+                    <div style="display: flex; flex-direction: column; gap: 24px;">
+
+                        <!-- LIVE PHONE MOCKUP CARD -->
+                        <section class="chart-card users-surface-card">
+                            <div class="chart-header users-card-header">
+                                <div class="users-card-header-text">
+                                    <h5><i class="fas fa-mobile-alt" style="color: var(--primary);"></i> Live In-App Notification Preview</h5>
+                                    <p class="chart-subtitle">অ্যান্ড্রয়েড ফোনে যেভাবে ইউজাররা নোটিফিকেশন দেখতে পাবেন</p>
+                                </div>
+                            </div>
+
+                            <div class="chart-body users-card-body-tight" style="padding: 20px;">
+                                <div class="preview-phone-mockup">
+                                    <div class="preview-header" style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                                        <div class="preview-app-icon">
+                                            <i class="fas fa-calculator"></i>
+                                        </div>
+                                        <div>
+                                            <div class="preview-app-name" style="font-weight: 800; font-size: 13px; color: #FFF;">HisabNiben</div>
+                                            <span id="preview-category-tag" style="font-size: 10.5px; background: rgba(245,73,39,0.25); color: #F54927; padding: 2px 6px; border-radius: 4px; font-weight: 700;">সাধারণ ঘোষণা</span>
+                                        </div>
+                                        <span style="margin-left: auto; font-size: 11px; color: #64748B;">এখনই</span>
+                                    </div>
+                                    <div class="preview-content">
+                                        <div class="preview-title" id="preview-title" style="font-weight: 800; font-size: 15px; color: #FFF; margin-bottom: 4px;">নোটিফিকেশন শিরোনাম</div>
+                                        <div class="preview-message" id="preview-message" style="font-size: 13px; color: #CBD5E1; line-height: 1.5;">আপনার নোটিফিকেশনের লেখাগুলো অ্যান্ড্রয়েড ফোনে যেভাবে দেখাবে...</div>
+                                        <img id="preview-image" class="preview-image" src="" alt="Preview Image" style="display: none; width: 100%; border-radius: 10px; margin-top: 10px; max-height: 160px; object-fit: cover;">
+                                        <div id="preview-cta-btn" class="preview-cta-btn" style="display: none;">দেখুন</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- HISTORY LIST CARD -->
+                        <section class="chart-card users-surface-card">
+                            <div class="chart-header users-card-header">
+                                <div class="users-card-header-text">
+                                    <h5><i class="fas fa-history" style="color: var(--primary);"></i> Sent Notifications History</h5>
+                                    <p class="chart-subtitle">পূর্বের পাঠানো সকল পুশ নোটিফিকেশন তালিকা (<strong id="total-sent">0</strong> sent)</p>
+                                </div>
+                            </div>
+
+                            <div class="chart-body users-card-body-tight" style="padding: 20px;">
+                                <div class="history-list" id="notification-history">
+                                    <div class="history-empty" style="text-align: center; padding: 40px; color: var(--gray-400);">
+                                        <div class="spinner" style="margin: 0 auto 10px auto;"></div>
+                                        <p style="margin-top: 10px;">নোটিফিকেশন হিস্ট্রি লোড হচ্ছে...</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                    </div>
+
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <div id="loader-container"></div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <script src="config/config.js"></script>
+    <script src="js/firebase.js"></script>
+    <script src="js/utils.js?v=1.0.2"></script>
+    <script src="js/main.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/notifications.js?v=1.0.6"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            await App.loadComponent('sidebar-container', 'components/sidebar.html');
+            await App.loadComponent('navbar-container', 'components/navbar.html');
+            await App.loadComponent('loader-container', 'components/loader.html');
+
+            const authenticated = await Auth.requireAuth();
+            if (!authenticated) return;
+
+            const profile = await Auth.getProfile();
+            if (profile) {
+                App.updateUserInfo(profile);
+            }
+
+            const pageTitle = document.getElementById('page-title');
+            if (pageTitle) pageTitle.textContent = 'Push Notifications Center';
+
+            if (typeof NotificationsModule !== 'undefined') {
+                await NotificationsModule.init();
+            }
+        });
+    </script>
+</body>
+</html>

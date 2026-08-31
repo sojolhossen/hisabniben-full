@@ -1,0 +1,173 @@
+/* Purchase History & Revenue Control Center Styling */
+
+.kpi-command-grid {
+    display: grid !important;
+    grid-template-columns: repeat(6, 1fr) !important;
+    gap: 16px !important;
+    margin-bottom: 24px !important;
+}
+
+@media (max-width: 1400px) {
+    .kpi-command-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .kpi-command-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .kpi-command-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+/* Revenue Analytics Charts Grid */
+.analytics-charts-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
+    margin-bottom: 24px;
+}
+
+@media (max-width: 1024px) {
+    .analytics-charts-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.chart-card-height {
+    height: 280px;
+    position: relative;
+}
+
+/* Method Badges */
+.method-badge {
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.method-badge.bkash { background: #E2136E15; color: #E2136E; border: 1px solid #E2136E30; }
+.method-badge.nagad { background: #F7931E15; color: #F7931E; border: 1px solid #F7931E30; }
+.method-badge.rocket { background: #8C349415; color: #8C3494; border: 1px solid #8C349430; }
+.method-badge.bank { background: #10B98115; color: #10B981; border: 1px solid #10B98130; }
+.method-badge.gplay { background: #4285F415; color: #4285F4; border: 1px solid #4285F430; }
+
+/* RIGHT-SIDE PURCHASE DETAIL DRAWER (600px) */
+.purchase-drawer-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(15, 23, 42, 0.5);
+    backdrop-filter: blur(4px);
+    z-index: 9999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.purchase-drawer-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.purchase-drawer-shell {
+    position: fixed;
+    top: 0;
+    right: -640px;
+    width: 100%;
+    max-width: 640px;
+    height: 100vh;
+    background: var(--bg-card);
+    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.2);
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    transition: right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    border-left: 1px solid var(--border-color);
+}
+
+.purchase-drawer-overlay.active .purchase-drawer-shell {
+    right: 0;
+}
+
+.purchase-drawer-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--bg-card);
+}
+
+.purchase-drawer-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
+}
+
+/* Payment Timeline */
+.payment-timeline {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    margin: 20px 0;
+    padding: 0 10px;
+}
+
+.payment-timeline::before {
+    content: '';
+    position: absolute;
+    top: 14px;
+    left: 30px;
+    right: 30px;
+    height: 3px;
+    background: var(--border-color);
+    z-index: 1;
+}
+
+.timeline-step {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+}
+
+.timeline-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--gray-200);
+    color: var(--gray-500);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    margin: 0 auto 6px auto;
+    border: 3px solid var(--bg-card);
+}
+
+.timeline-step.completed .timeline-icon {
+    background: #10B981;
+    color: white;
+}
+
+.timeline-step.active .timeline-icon {
+    background: #F59E0B;
+    color: white;
+}
+
+.timeline-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--gray-600);
+}
