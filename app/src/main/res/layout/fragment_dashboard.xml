@@ -13,7 +13,9 @@
         <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:fillViewport="true">
+            android:fillViewport="true"
+            android:overScrollMode="never"
+            android:scrollbars="none">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -321,7 +323,7 @@
                         android:focusable="true"
                         app:cardBackgroundColor="#1E1B4B"
                         app:cardCornerRadius="16dp"
-                        app:cardElevation="3dp"
+                        app:cardElevation="0dp"
                         app:strokeColor="#4338CA"
                         app:strokeWidth="1.5dp">
 
@@ -391,7 +393,7 @@
                         android:layout_height="wrap_content"
                         app:cardBackgroundColor="@color/primary"
                         app:cardCornerRadius="18dp"
-                        app:cardElevation="4dp">
+                        app:cardElevation="0dp">
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -447,7 +449,7 @@
                             android:layout_marginEnd="6dp"
                             app:cardBackgroundColor="@color/white"
                             app:cardCornerRadius="14dp"
-                            app:cardElevation="1dp"
+                            app:cardElevation="0dp"
                             app:strokeColor="@color/divider"
                             app:strokeWidth="1dp">
 
@@ -488,7 +490,7 @@
                             android:layout_marginStart="6dp"
                             app:cardBackgroundColor="@color/white"
                             app:cardCornerRadius="14dp"
-                            app:cardElevation="1dp"
+                            app:cardElevation="0dp"
                             app:strokeColor="@color/divider"
                             app:strokeWidth="1dp">
 
@@ -537,7 +539,7 @@
                             android:layout_marginEnd="6dp"
                             app:cardBackgroundColor="@color/white"
                             app:cardCornerRadius="14dp"
-                            app:cardElevation="1dp"
+                            app:cardElevation="0dp"
                             app:strokeColor="@color/divider"
                             app:strokeWidth="1dp">
 
@@ -578,7 +580,7 @@
                             android:layout_marginStart="6dp"
                             app:cardBackgroundColor="@color/white"
                             app:cardCornerRadius="14dp"
-                            app:cardElevation="1dp"
+                            app:cardElevation="0dp"
                             app:strokeColor="@color/divider"
                             app:strokeWidth="1dp">
 
@@ -621,7 +623,7 @@
                         android:layout_marginTop="12dp"
                         app:cardBackgroundColor="@color/white"
                         app:cardCornerRadius="16dp"
-                        app:cardElevation="2dp"
+                        app:cardElevation="0dp"
                         app:strokeColor="@color/divider"
                         app:strokeWidth="1dp">
 
@@ -830,7 +832,7 @@
                             android:layout_marginEnd="6dp"
                             app:cardBackgroundColor="@color/white"
                             app:cardCornerRadius="14dp"
-                            app:cardElevation="1dp"
+                            app:cardElevation="0dp"
                             app:strokeColor="@color/baki_color"
                             app:strokeWidth="1dp">
 
@@ -879,7 +881,7 @@
                             android:layout_marginStart="6dp"
                             app:cardBackgroundColor="@color/white"
                             app:cardCornerRadius="14dp"
-                            app:cardElevation="1dp"
+                            app:cardElevation="0dp"
                             app:strokeColor="@color/warning"
                             app:strokeWidth="1dp">
 
@@ -929,7 +931,7 @@
                         android:layout_marginTop="16dp"
                         app:cardBackgroundColor="@color/white"
                         app:cardCornerRadius="16dp"
-                        app:cardElevation="1dp"
+                        app:cardElevation="0dp"
                         app:strokeColor="@color/divider"
                         app:strokeWidth="1dp">
 
@@ -1085,86 +1087,104 @@
                         android:textStyle="bold"
                         android:textColor="@color/text_primary" />
 
-                    <GridLayout
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
-                        android:columnCount="2"
-                        android:rowCount="3">
+                        android:orientation="vertical">
 
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/btnQuickSale"
-                            android:layout_width="0dp"
-                            android:layout_height="50dp"
-                            android:layout_columnWeight="1"
-                            android:layout_marginEnd="4dp"
-                            android:layout_marginBottom="8dp"
-                            android:text="+ চাল বিক্রি"
-                            android:textSize="13sp"
-                            android:textStyle="bold"
-                            app:backgroundTint="@color/success"
-                            app:cornerRadius="12dp" />
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginBottom="8dp">
 
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/btnQuickPurchase"
-                            android:layout_width="0dp"
-                            android:layout_height="50dp"
-                            android:layout_columnWeight="1"
-                            android:layout_marginStart="4dp"
-                            android:layout_marginBottom="8dp"
-                            android:text="+ চাল ক্রয়"
-                            android:textSize="13sp"
-                            android:textStyle="bold"
-                            app:backgroundTint="@color/primary"
-                            app:cornerRadius="12dp" />
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btnQuickSale"
+                                android:layout_width="0dp"
+                                android:layout_height="50dp"
+                                android:layout_weight="1"
+                                android:layout_marginEnd="4dp"
+                                android:text="+ চাল বিক্রি"
+                                android:textSize="13sp"
+                                android:textStyle="bold"
+                                app:backgroundTint="@color/success"
+                                app:cornerRadius="12dp" />
 
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/btnQuickCollection"
-                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                            android:layout_width="0dp"
-                            android:layout_height="46dp"
-                            android:layout_columnWeight="1"
-                            android:layout_marginEnd="4dp"
-                            android:layout_marginBottom="8dp"
-                            android:text="+ টাকা জমা"
-                            android:textSize="12sp"
-                            app:cornerRadius="10dp" />
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btnQuickPurchase"
+                                android:layout_width="0dp"
+                                android:layout_height="50dp"
+                                android:layout_weight="1"
+                                android:layout_marginStart="4dp"
+                                android:text="+ চাল ক্রয়"
+                                android:textSize="13sp"
+                                android:textStyle="bold"
+                                app:backgroundTint="@color/primary"
+                                app:cornerRadius="12dp" />
 
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/btnQuickSupplierPayment"
-                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                            android:layout_width="0dp"
-                            android:layout_height="46dp"
-                            android:layout_columnWeight="1"
-                            android:layout_marginStart="4dp"
-                            android:layout_marginBottom="8dp"
-                            android:text="+ মহাজন পরিশোধ"
-                            android:textSize="12sp"
-                            app:cornerRadius="10dp" />
+                        </LinearLayout>
 
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/btnQuickExpense"
-                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                            android:layout_width="0dp"
-                            android:layout_height="46dp"
-                            android:layout_columnWeight="1"
-                            android:layout_marginEnd="4dp"
-                            android:text="+ খরচ"
-                            android:textSize="12sp"
-                            app:cornerRadius="10dp" />
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginBottom="8dp">
 
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/btnQuickAddRice"
-                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                            android:layout_width="0dp"
-                            android:layout_height="46dp"
-                            android:layout_columnWeight="1"
-                            android:layout_marginStart="4dp"
-                            android:text="+ চাল যোগ"
-                            android:textSize="12sp"
-                            app:cornerRadius="10dp" />
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btnQuickCollection"
+                                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                                android:layout_width="0dp"
+                                android:layout_height="46dp"
+                                android:layout_weight="1"
+                                android:layout_marginEnd="4dp"
+                                android:text="+ টাকা জমা"
+                                android:textSize="12sp"
+                                app:cornerRadius="10dp" />
 
-                    </GridLayout>
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btnQuickSupplierPayment"
+                                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                                android:layout_width="0dp"
+                                android:layout_height="46dp"
+                                android:layout_weight="1"
+                                android:layout_marginStart="4dp"
+                                android:text="+ মহাজন পরিশোধ"
+                                android:textSize="12sp"
+                                app:cornerRadius="10dp" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btnQuickExpense"
+                                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                                android:layout_width="0dp"
+                                android:layout_height="46dp"
+                                android:layout_weight="1"
+                                android:layout_marginEnd="4dp"
+                                android:text="+ খরচ"
+                                android:textSize="12sp"
+                                app:cornerRadius="10dp" />
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btnQuickAddRice"
+                                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                                android:layout_width="0dp"
+                                android:layout_height="46dp"
+                                android:layout_weight="1"
+                                android:layout_marginStart="4dp"
+                                android:text="+ চাল যোগ"
+                                android:textSize="12sp"
+                                app:cornerRadius="10dp" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
 
                     <!-- RECENT TRANSACTIONS -->
                     <TextView
