@@ -105,6 +105,7 @@ public class DashboardFragment extends Fragment {
 
         initViews(view);
         setupListeners();
+        updatePeriodTitles();
         loadUserData();
         loadDashboardData();
         updateNotificationBadge();
@@ -115,6 +116,7 @@ public class DashboardFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        updatePeriodTitles();
         updateNotificationBadge();
         updateSubscriptionHeaderStatus();
         checkTutorialBannerVisibility();
@@ -393,6 +395,7 @@ public class DashboardFragment extends Fragment {
                 currentPeriodFilter = FILTER_TODAY;
             }
             updatePeriodTitles();
+            lastFetchTime = 0; // Force immediate fresh query for selected period
             loadDashboardData();
         });
 
@@ -504,31 +507,33 @@ public class DashboardFragment extends Fragment {
     }
 
     private void updatePeriodTitles() {
-        SimpleDateFormat sdf = new SimpleDateFormat("dd MMMM", Locale.ENGLISH);
+        if (tvSelectedDatePeriod == null) return;
+
+        SimpleDateFormat sdf = new SimpleDateFormat("dd MMMM", new Locale("bn", "BD"));
         sdf.setTimeZone(TimeZone.getTimeZone("Asia/Dhaka"));
         String dateStr = sdf.format(new Date());
 
         if (FILTER_THIS_WEEK.equals(currentPeriodFilter)) {
-            tvSelectedDatePeriod.setText("এই সপ্তাহের হিসাব");
-            tvPrimarySalesTitle.setText("এই সপ্তাহের চাল বিক্রি (Sales)");
-            tvPurchasesTitle.setText("এই সপ্তাহের ক্রয়");
-            tvCollectionsTitle.setText("সপ্তাহে জমা");
-            tvDuesTitle.setText("সপ্তাহের বাকি");
-            tvProfitTitle.setText("সপ্তাহের নিট লাভ");
+            tvSelectedDatePeriod.setText("এই সপ্তাহ");
+            if (tvPrimarySalesTitle != null) tvPrimarySalesTitle.setText("এই সপ্তাহের চাল বিক্রি (Sales)");
+            if (tvPurchasesTitle != null) tvPurchasesTitle.setText("এই সপ্তাহের ক্রয়");
+            if (tvCollectionsTitle != null) tvCollectionsTitle.setText("সপ্তাহের জমা");
+            if (tvDuesTitle != null) tvDuesTitle.setText("সপ্তাহের বাকি");
+            if (tvProfitTitle != null) tvProfitTitle.setText("সপ্তাহের নিট লাভ");
         } else if (FILTER_THIS_MONTH.equals(currentPeriodFilter)) {
-            tvSelectedDatePeriod.setText("এই মাসের হিসাব");
-            tvPrimarySalesTitle.setText("এই মাসের চাল বিক্রি (Sales)");
-            tvPurchasesTitle.setText("এই মাসের ক্রয়");
-            tvCollectionsTitle.setText("মাসে জমা");
-            tvDuesTitle.setText("মাসের বাকি");
-            tvProfitTitle.setText("মাসের নিট লাভ");
+            tvSelectedDatePeriod.setText("এই মাস");
+            if (tvPrimarySalesTitle != null) tvPrimarySalesTitle.setText("এই মাসের চাল বিক্রি (Sales)");
+            if (tvPurchasesTitle != null) tvPurchasesTitle.setText("এই মাসের ক্রয়");
+            if (tvCollectionsTitle != null) tvCollectionsTitle.setText("মাসের জমা");
+            if (tvDuesTitle != null) tvDuesTitle.setText("মাসের বাকি");
+            if (tvProfitTitle != null) tvProfitTitle.setText("মাসের নিট লাভ");
         } else {
             tvSelectedDatePeriod.setText("আজ, " + dateStr);
-            tvPrimarySalesTitle.setText("আজকের চাল বিক্রি (Sales)");
-            tvPurchasesTitle.setText("আজকের ক্রয়");
-            tvCollectionsTitle.setText("আজ জমা");
-            tvDuesTitle.setText("আজকের বাকি");
-            tvProfitTitle.setText("আজকের নিট লাভ");
+            if (tvPrimarySalesTitle != null) tvPrimarySalesTitle.setText("আজকের চাল বিক্রি (Sales)");
+            if (tvPurchasesTitle != null) tvPurchasesTitle.setText("আজকের ক্রয়");
+            if (tvCollectionsTitle != null) tvCollectionsTitle.setText("আজ জমা");
+            if (tvDuesTitle != null) tvDuesTitle.setText("আজকের বাকি");
+            if (tvProfitTitle != null) tvProfitTitle.setText("আজকের নিট লাভ");
         }
     }
 
