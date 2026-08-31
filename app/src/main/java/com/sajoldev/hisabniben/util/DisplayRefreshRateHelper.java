@@ -6,10 +6,21 @@ import android.view.Display;
 import android.view.Window;
 import android.view.WindowManager;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class DisplayRefreshRateHelper {
+
+    private static final Set<Integer> configuredActivities = new HashSet<>();
 
     public static void enableHighRefreshRate(Activity activity) {
         if (activity == null || activity.getWindow() == null) return;
+
+        int activityHash = activity.hashCode();
+        if (configuredActivities.contains(activityHash)) {
+            return; // Already configured for this activity instance, do not trigger window setAttributes again
+        }
+        configuredActivities.add(activityHash);
 
         try {
             Window window = activity.getWindow();

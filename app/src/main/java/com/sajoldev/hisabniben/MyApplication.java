@@ -40,16 +40,10 @@ public class MyApplication extends Application {
             }
 
             @Override
-            public void onActivityStarted(@NonNull Activity activity) {
-                ScreenSecurityHelper.allowScreenSharingAndRecording(activity);
-                DisplayRefreshRateHelper.enableHighRefreshRate(activity);
-            }
+            public void onActivityStarted(@NonNull Activity activity) {}
 
             @Override
-            public void onActivityResumed(@NonNull Activity activity) {
-                ScreenSecurityHelper.allowScreenSharingAndRecording(activity);
-                DisplayRefreshRateHelper.enableHighRefreshRate(activity);
-            }
+            public void onActivityResumed(@NonNull Activity activity) {}
 
             @Override
             public void onActivityPaused(@NonNull Activity activity) {}
