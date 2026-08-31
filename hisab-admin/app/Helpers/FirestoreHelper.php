@@ -219,7 +219,18 @@ class FirestoreHelper
     {
         $projectId = self::getProjectId();
         $apiKey = env('FIREBASE_API_KEY', 'AIzaSyCknq4ArQmWsLgGDNm0uH4fqPs4I1eQE4A');
+        
+        $updateMasks = [];
+        foreach ($data as $key => $val) {
+            if ($key === 'id') continue;
+            $updateMasks[] = 'updateMask.fieldPaths=' . urlencode($key);
+        }
+
+        $maskQuery = implode('&', $updateMasks);
         $url = "https://firestore.googleapis.com/v1/projects/{$projectId}/databases/(default)/documents/{$collectionName}/{$docId}?key={$apiKey}";
+        if (!empty($maskQuery)) {
+            $url .= "&{$maskQuery}";
+        }
 
         $payload = json_encode(self::encodeFields($data));
 
