@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
@@ -63,6 +64,7 @@ public class DashboardFragment extends Fragment {
     public static final String FILTER_THIS_MONTH = "THIS_MONTH";
 
     private SwipeRefreshLayout swipeRefresh;
+    private NestedScrollView nestedScrollView;
     private ProgressBar progressBar;
     private TextView tvGreeting, tvBusinessName, tvSmsBalance, tvNotificationBadge, tvSelectedDatePeriod;
     private TextView tvPrimarySalesTitle, tvPrimarySalesAmount, tvSalesComparison;
@@ -264,6 +266,7 @@ public class DashboardFragment extends Fragment {
 
     private void initViews(View view) {
         swipeRefresh = view.findViewById(R.id.swipeRefresh);
+        nestedScrollView = view.findViewById(R.id.nestedScrollView);
         progressBar = view.findViewById(R.id.progressBar);
 
         ivBusinessAvatar = view.findViewById(R.id.ivBusinessAvatar);
@@ -325,6 +328,11 @@ public class DashboardFragment extends Fragment {
 
     private void setupListeners() {
         swipeRefresh.setOnRefreshListener(this::loadDashboardData);
+
+        // Crucial for 120Hz smooth scrolling: Prevent SwipeRefreshLayout from stealing scroll touch events while scrolling down
+        if (swipeRefresh != null && nestedScrollView != null) {
+            swipeRefresh.setOnChildScrollUpCallback((parent, child) -> nestedScrollView.canScrollVertically(-1));
+        }
 
         if (btnHeaderRenewPackage != null) {
             btnHeaderRenewPackage.setOnClickListener(v -> {
