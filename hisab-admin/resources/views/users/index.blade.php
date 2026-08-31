@@ -6,7 +6,7 @@
 <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:24px;">
     <div>
         <h1 style="font-size:24px; font-weight:800; color:var(--dark);">Merchant Directory & A-to-Z CRM</h1>
-        <p style="font-size:13.5px; color:var(--text-muted); margin-top:2px;">Manage user accounts, business insights, customer dues, suppliers, subscriptions & account deletion</p>
+        <p style="font-size:13.5px; color:var(--text-muted); margin-top:2px;">Manage user accounts, business insights, customer dues, suppliers, subscriptions, SMS top-up & account deletion</p>
     </div>
 </div>
 
@@ -52,6 +52,9 @@
                     @php
                         $now = time() * 1000;
                         $initial = strtoupper(substr($u['name'] ?? $u['phone'] ?? 'M', 0, 1));
+                        $isBlocked = !empty($u['isBlocked']) || !empty($u['disabled']);
+                        $isPremium = !empty($u['isPremium']);
+                        $onTrial = !empty($u['trialEnd']) && $u['trialEnd'] > $now;
                     @endphp
                     <tr>
                         <td>
@@ -66,11 +69,11 @@
                         <td><strong>{{ $u['storeName'] ?? $u['shopName'] ?? '-' }}</strong></td>
                         <td><code>{{ $u['phone'] ?? '-' }}</code></td>
                         <td>
-                            @if(!empty($u['isBlocked']) || !empty($u['disabled']))
+                            @if($isBlocked)
                                 <span class="badge badge-danger">BLOCKED</span>
-                            @elseif(!empty($u['isPremium']))
+                            @elseif($isPremium)
                                 <span class="badge badge-success">PREMIUM</span>
-                            @elseif(!empty($u['trialEnd']) && $u['trialEnd'] > $now)
+                            @elseif($onTrial)
                                 <span class="badge badge-warning">TRIAL</span>
                             @else
                                 <span class="badge badge-danger">EXPIRED</span>
@@ -78,10 +81,10 @@
                         </td>
                         <td><strong style="color:#3B82F6;">{{ $u['smsLimit'] ?? 0 }} SMS</strong></td>
                         <td>
-                            @if(!empty($u['isPremium']) && !empty($u['subscriptionExpiryDate']))
+                            @if($isPremium && !empty($u['subscriptionExpiryDate']))
                                 @php $days = ceil(($u['subscriptionExpiryDate'] - $now) / (1000*60*60*24)); @endphp
                                 {{ $days >= 999 ? 'Life-Time' : ($days > 0 ? $days.' days left' : 'Expired today') }}
-                            @elseif(!empty($u['trialEnd']) && $u['trialEnd'] > $now)
+                            @elseif($onTrial)
                                 @php $trialDays = ceil(($u['trialEnd'] - $now) / (1000*60*60*24)); @endphp
                                 {{ $trialDays }} trial day(s)
                             @else
@@ -90,13 +93,26 @@
                         </td>
                         <td style="text-align:right;">
                             <div style="display:inline-flex; gap:6px;">
-                                <button class="btn btn-primary" style="padding:4px 8px; font-size:11px;" onclick="openCrmModal('{{ $u['id'] }}')">
+                                <button class="btn btn-primary" style="padding:4px 8px; font-size:11px;" onclick="openCrmModal('{{ $u['id'] }}')" title="View Full CRM Profile">
                                     <i class="fas fa-eye"></i> CRM
                                 </button>
-                                <button class="btn btn-outline" style="padding:4px 8px; font-size:11px;" onclick="openEditModal('{{ $u['id'] }}', '{{ addslashes($u['name'] ?? '') }}', '{{ addslashes($u['phone'] ?? '') }}', '{{ addslashes($u['email'] ?? '') }}', '{{ addslashes($u['storeName'] ?? '') }}')">
+                                <button class="btn btn-outline" style="padding:4px 8px; font-size:11px; color:#10B981; border-color:#10B981;" onclick="openSubscriptionModal('{{ $u['id'] }}', '{{ addslashes($u['name'] ?? 'Merchant') }}', '{{ addslashes($u['subscriptionPackageName'] ?? 'Yearly Plan') }}', 365)" title="Manage Subscription">
+                                    <i class="fas fa-crown"></i>
+                                </button>
+                                <button class="btn btn-outline" style="padding:4px 8px; font-size:11px; color:#3B82F6; border-color:#3B82F6;" onclick="openSmsModal('{{ $u['id'] }}', '{{ addslashes($u['name'] ?? 'Merchant') }}', {{ $u['smsLimit'] ?? 0 }})" title="Top-up SMS Balance">
+                                    <i class="fas fa-comment-sms"></i>
+                                </button>
+                                <button class="btn btn-outline" style="padding:4px 8px; font-size:11px;" onclick="openEditModal('{{ $u['id'] }}', '{{ addslashes($u['name'] ?? '') }}', '{{ addslashes($u['phone'] ?? '') }}', '{{ addslashes($u['email'] ?? '') }}', '{{ addslashes($u['storeName'] ?? '') }}')" title="Edit Profile">
                                     <i class="fas fa-edit"></i>
                                 </button>
-                                <button class="btn btn-danger" style="padding:4px 8px; font-size:11px;" onclick="openDeleteModal('{{ $u['id'] }}', '{{ addslashes($u['name'] ?? 'Merchant') }}', '{{ addslashes($u['phone'] ?? '') }}')">
+                                <form method="POST" action="{{ route('users.ban') }}" style="display:inline;">
+                                    @csrf
+                                    <input type="hidden" name="id" value="{{ $u['id'] }}">
+                                    <button type="submit" class="btn btn-outline" style="padding:4px 8px; font-size:11px; color:var(--warning); border-color:var(--warning);" title="{{ $isBlocked ? 'Unblock Merchant' : 'Block Merchant' }}">
+                                        <i class="fas {{ $isBlocked ? 'fa-check-circle' : 'fa-ban' }}"></i>
+                                    </button>
+                                </form>
+                                <button class="btn btn-danger" style="padding:4px 8px; font-size:11px;" onclick="openDeleteModal('{{ $u['id'] }}', '{{ addslashes($u['name'] ?? 'Merchant') }}', '{{ addslashes($u['phone'] ?? '') }}')" title="Purge Account">
                                     <i class="fas fa-trash-alt"></i>
                                 </button>
                             </div>
@@ -114,7 +130,7 @@
 
 <!-- CRM MODAL OVERLAY -->
 <div id="crm-modal" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.6); backdrop-filter:blur(4px); z-index:1000; align-items:center; justify-content:center; padding:20px;">
-    <div style="background:white; border-radius:16px; width:100%; max-width:900px; max-height:90vh; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 25px 50px rgba(0,0,0,0.25);">
+    <div style="background:white; border-radius:16px; width:100%; max-width:960px; max-height:92vh; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 25px 50px rgba(0,0,0,0.25);">
         <!-- Header -->
         <div style="padding:20px 24px; background:var(--dark); color:white; display:flex; align-items:center; justify-content:space-between;">
             <div>
@@ -122,6 +138,34 @@
                 <p id="crm-user-store" style="font-size:12px; color:#94A3B8; margin-top:2px; margin-bottom:0;">Loading business insights...</p>
             </div>
             <button onclick="closeCrmModal()" style="background:none; border:none; color:white; font-size:20px; cursor:pointer;"><i class="fas fa-times"></i></button>
+        </div>
+
+        <!-- QUICK ACTIONS BAR -->
+        <div style="background:#F8FAFC; border-bottom:1px solid var(--border-color); padding:12px 24px; display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:space-between;">
+            <div style="font-size:12px; font-weight:800; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px;">
+                <i class="fas fa-bolt" style="color:var(--primary);"></i> CRM Action Control Panel:
+            </div>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <button type="button" class="btn btn-primary" style="padding:6px 12px; font-size:12px;" onclick="crmActionSubscription()">
+                    <i class="fas fa-crown"></i> Manage Subscription
+                </button>
+                <button type="button" class="btn btn-outline" style="padding:6px 12px; font-size:12px; color:#3B82F6; border-color:#3B82F6;" onclick="crmActionSms()">
+                    <i class="fas fa-comment-sms"></i> Top-up SMS
+                </button>
+                <button type="button" class="btn btn-outline" style="padding:6px 12px; font-size:12px;" onclick="crmActionEdit()">
+                    <i class="fas fa-edit"></i> Edit Profile
+                </button>
+                <form id="crm-ban-form" method="POST" action="{{ route('users.ban') }}" style="display:inline;">
+                    @csrf
+                    <input type="hidden" name="id" id="crm-ban-user-id">
+                    <button type="submit" id="crm-ban-btn" class="btn btn-outline" style="padding:6px 12px; font-size:12px; color:var(--warning); border-color:var(--warning);">
+                        <i class="fas fa-ban"></i> Toggle Ban
+                    </button>
+                </form>
+                <button type="button" class="btn btn-danger" style="padding:6px 12px; font-size:12px;" onclick="crmActionDelete()">
+                    <i class="fas fa-trash-alt"></i> Delete Account
+                </button>
+            </div>
         </div>
 
         <!-- Body -->
@@ -165,7 +209,7 @@
                 </div>
             </div>
 
-            <!-- Customer & Transaction Directories Grid -->
+            <!-- Customer & Supplier & Transaction Directories Grid -->
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:20px;">
                 <div>
                     <h4 style="font-size:14px; font-weight:800; margin-bottom:10px; color:var(--dark);"><i class="fas fa-address-book" style="color:var(--primary);"></i> Customers Directory (কাস্টমার তালিকা)</h4>
@@ -181,12 +225,77 @@
                     </div>
                 </div>
             </div>
+
+            <div style="margin-top:20px;">
+                <h4 style="font-size:14px; font-weight:800; margin-bottom:10px; color:var(--dark);"><i class="fas fa-comment-dots" style="color:var(--info);"></i> SMS History & Log (এসএমএস হিস্ট্রি)</h4>
+                <div id="crm-sms-container" style="background:var(--bg-body); border:1px solid var(--border-color); border-radius:10px; padding:12px; font-size:13px; max-height:180px; overflow-y:auto;">
+                    Loading SMS history...
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
+<!-- MANAGE SUBSCRIPTION MODAL -->
+<div id="subscription-modal" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.6); backdrop-filter:blur(4px); z-index:1010; align-items:center; justify-content:center; padding:20px;">
+    <div style="background:white; border-radius:16px; width:100%; max-width:460px; padding:24px; box-shadow:0 25px 50px rgba(0,0,0,0.25);">
+        <h3 style="font-size:18px; font-weight:800; margin-bottom:6px;"><i class="fas fa-crown" style="color:var(--warning);"></i> Upgrade / Renew Subscription</h3>
+        <p style="font-size:12.5px; color:var(--text-muted); margin-bottom:16px;">Update subscription package and validity duration for <strong id="sub-merchant-name">Merchant</strong></p>
+
+        <form method="POST" action="{{ route('users.subscription') }}">
+            @csrf
+            <input type="hidden" name="id" id="sub-user-id">
+
+            <div style="margin-bottom:14px;">
+                <label style="font-size:12px; font-weight:700; display:block; margin-bottom:6px;">Package Name</label>
+                <input type="text" name="packageName" id="sub-pkg-name" required placeholder="e.g. Yearly Premium Plan" class="btn btn-outline" style="width:100%; text-align:left;">
+            </div>
+
+            <div style="margin-bottom:20px;">
+                <label style="font-size:12px; font-weight:700; display:block; margin-bottom:6px;">Duration (Days)</label>
+                <select name="durationDays" id="sub-duration" class="btn btn-outline" style="width:100%;">
+                    <option value="30">1 Month (30 Days)</option>
+                    <option value="60">2 Months (60 Days)</option>
+                    <option value="90">3 Months (90 Days)</option>
+                    <option value="180">6 Months (180 Days)</option>
+                    <option value="365" selected>1 Year (365 Days)</option>
+                    <option value="999">Lifetime Validity</option>
+                </select>
+            </div>
+
+            <div style="display:flex; justify-content:flex-end; gap:10px;">
+                <button type="button" class="btn btn-outline" onclick="closeSubscriptionModal()">Cancel</button>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-check-circle"></i> Update Subscription</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- SMS BALANCE TOP-UP MODAL -->
+<div id="sms-modal" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.6); backdrop-filter:blur(4px); z-index:1010; align-items:center; justify-content:center; padding:20px;">
+    <div style="background:white; border-radius:16px; width:100%; max-width:440px; padding:24px; box-shadow:0 25px 50px rgba(0,0,0,0.25);">
+        <h3 style="font-size:18px; font-weight:800; margin-bottom:6px;"><i class="fas fa-comment-sms" style="color:#3B82F6;"></i> Recharge Free SMS Balance</h3>
+        <p style="font-size:12.5px; color:var(--text-muted); margin-bottom:16px;">Top-up SMS quota for <strong id="sms-merchant-name">Merchant</strong></p>
+
+        <form method="POST" action="{{ route('users.sms') }}">
+            @csrf
+            <input type="hidden" name="id" id="sms-user-id">
+
+            <div style="margin-bottom:20px;">
+                <label style="font-size:12px; font-weight:700; display:block; margin-bottom:6px;">Total SMS Limit</label>
+                <input type="number" name="smsLimit" id="sms-limit-input" required min="0" placeholder="e.g. 100" class="btn btn-outline" style="width:100%; text-align:left;">
+            </div>
+
+            <div style="display:flex; justify-content:flex-end; gap:10px;">
+                <button type="button" class="btn btn-outline" onclick="closeSmsModal()">Cancel</button>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-coins"></i> Update SMS Balance</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <!-- EDIT USER MODAL -->
-<div id="edit-user-modal" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.6); backdrop-filter:blur(4px); z-index:1000; align-items:center; justify-content:center; padding:20px;">
+<div id="edit-user-modal" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.6); backdrop-filter:blur(4px); z-index:1010; align-items:center; justify-content:center; padding:20px;">
     <div style="background:white; border-radius:16px; width:100%; max-width:460px; padding:24px; box-shadow:0 25px 50px rgba(0,0,0,0.25);">
         <h3 style="font-size:18px; font-weight:800; margin-bottom:16px;">Edit Merchant Profile</h3>
 
@@ -223,7 +332,7 @@
 </div>
 
 <!-- DELETE CONFIRMATION MODAL -->
-<div id="delete-modal" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.6); backdrop-filter:blur(4px); z-index:1000; align-items:center; justify-content:center; padding:20px;">
+<div id="delete-modal" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.6); backdrop-filter:blur(4px); z-index:1010; align-items:center; justify-content:center; padding:20px;">
     <div style="background:white; border-radius:16px; width:100%; max-width:460px; padding:24px; box-shadow:0 25px 50px rgba(0,0,0,0.25);">
         <h3 style="color:var(--danger); font-size:18px; font-weight:800; margin-bottom:12px;"><i class="fas fa-exclamation-triangle"></i> Permanent Account & Data Purge</h3>
         <p style="font-size:13px; color:var(--text-main); margin-bottom:14px;">
@@ -254,6 +363,7 @@
 @section('scripts')
 <script>
 const crmBaseUrl = "{{ url('/users') }}";
+let activeCrmUser = null;
 
 function openCrmModal(userId) {
     document.getElementById('crm-modal').style.display = 'flex';
@@ -261,6 +371,7 @@ function openCrmModal(userId) {
     document.getElementById('crm-user-store').textContent = 'Loading business insights from Firebase...';
     document.getElementById('crm-customers-container').innerHTML = '<div style="color:var(--text-muted); font-size:12px;">Loading customers...</div>';
     document.getElementById('crm-tx-container').innerHTML = '<div style="color:var(--text-muted); font-size:12px;">Loading transactions...</div>';
+    document.getElementById('crm-sms-container').innerHTML = '<div style="color:var(--text-muted); font-size:12px;">Loading SMS history...</div>';
 
     fetch(crmBaseUrl + '/' + userId + '/crm')
         .then(res => {
@@ -272,6 +383,15 @@ function openCrmModal(userId) {
                 alert(data.error);
                 return;
             }
+            activeCrmUser = data.user;
+            document.getElementById('crm-ban-user-id').value = data.user.id;
+
+            const isBlocked = !!(data.user.isBlocked || data.user.disabled);
+            const banBtn = document.getElementById('crm-ban-btn');
+            if (banBtn) {
+                banBtn.innerHTML = isBlocked ? '<i class="fas fa-check-circle"></i> Unblock Account' : '<i class="fas fa-ban"></i> Ban Account';
+            }
+
             document.getElementById('crm-user-name').textContent = data.user.name || 'Merchant Profile';
             document.getElementById('crm-user-store').textContent = (data.user.storeName || data.user.shopName || 'Rice Store') + ' • Phone: ' + (data.user.phone || '-') + ' • Email: ' + (data.user.email || '-');
 
@@ -320,17 +440,75 @@ function openCrmModal(userId) {
                     `;
                 }).join('');
             document.getElementById('crm-tx-container').innerHTML = txList;
+
+            // SMS History List
+            let smsList = (!data.smsHistory || data.smsHistory.length === 0)
+                ? '<div style="color:var(--text-muted); font-size:12px;">No SMS logs recorded yet.</div>'
+                : data.smsHistory.map(s => `
+                    <div style="padding:6px 0; border-bottom:1px dashed var(--border-color); font-size:12px;">
+                        <div style="display:flex; justify-content:space-between;">
+                            <strong>To: ${s.customerName || 'Customer'} (${s.customerPhone || '-'})</strong>
+                            <span style="font-size:10.5px; color:var(--text-muted);">${s.timestamp ? new Date(s.timestamp).toLocaleDateString() : ''}</span>
+                        </div>
+                        <div style="font-size:11.5px; color:var(--text-main); margin-top:2px;">"${s.message || ''}"</div>
+                    </div>
+                `).join('');
+            document.getElementById('crm-sms-container').innerHTML = smsList;
         })
         .catch(err => {
             console.error('CRM fetch error:', err);
             document.getElementById('crm-user-store').textContent = 'Failed to load merchant CRM insights.';
             document.getElementById('crm-customers-container').innerHTML = '<div style="color:var(--danger); font-size:12px;">Error fetching merchant details.</div>';
             document.getElementById('crm-tx-container').innerHTML = '<div style="color:var(--danger); font-size:12px;">Error fetching transactions.</div>';
+            document.getElementById('crm-sms-container').innerHTML = '<div style="color:var(--danger); font-size:12px;">Error fetching SMS log.</div>';
         });
+}
+
+function crmActionSubscription() {
+    if (!activeCrmUser) return;
+    openSubscriptionModal(activeCrmUser.id, activeCrmUser.name || 'Merchant', activeCrmUser.subscriptionPackageName || 'Yearly Plan', 365);
+}
+
+function crmActionSms() {
+    if (!activeCrmUser) return;
+    openSmsModal(activeCrmUser.id, activeCrmUser.name || 'Merchant', activeCrmUser.smsLimit || 0);
+}
+
+function crmActionEdit() {
+    if (!activeCrmUser) return;
+    openEditModal(activeCrmUser.id, activeCrmUser.name || '', activeCrmUser.phone || '', activeCrmUser.email || '', activeCrmUser.storeName || activeCrmUser.shopName || '');
+}
+
+function crmActionDelete() {
+    if (!activeCrmUser) return;
+    openDeleteModal(activeCrmUser.id, activeCrmUser.name || 'Merchant', activeCrmUser.phone || '');
 }
 
 function closeCrmModal() {
     document.getElementById('crm-modal').style.display = 'none';
+}
+
+function openSubscriptionModal(userId, name, pkgName, duration) {
+    document.getElementById('sub-user-id').value = userId;
+    document.getElementById('sub-merchant-name').textContent = name;
+    document.getElementById('sub-pkg-name').value = pkgName || 'Yearly Premium Plan';
+    document.getElementById('sub-duration').value = duration || 365;
+    document.getElementById('subscription-modal').style.display = 'flex';
+}
+
+function closeSubscriptionModal() {
+    document.getElementById('subscription-modal').style.display = 'none';
+}
+
+function openSmsModal(userId, name, smsLimit) {
+    document.getElementById('sms-user-id').value = userId;
+    document.getElementById('sms-merchant-name').textContent = name;
+    document.getElementById('sms-limit-input').value = smsLimit || 0;
+    document.getElementById('sms-modal').style.display = 'flex';
+}
+
+function closeSmsModal() {
+    document.getElementById('sms-modal').style.display = 'none';
 }
 
 function openEditModal(userId, name, phone, email, store) {
