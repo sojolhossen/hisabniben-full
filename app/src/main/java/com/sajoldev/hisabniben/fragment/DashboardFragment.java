@@ -570,7 +570,9 @@ public class DashboardFragment extends Fragment {
 
         long startTimestamp = getPeriodStartTimestamp(currentPeriodFilter);
 
-        progressBar.setVisibility(View.VISIBLE);
+        if (progressBar != null && !swipeRefresh.isRefreshing()) {
+            progressBar.setVisibility(View.GONE);
+        }
 
         // 1. Aggregates for Sales (with Timestamp query optimization)
         db.collection("sales")
@@ -657,7 +659,7 @@ public class DashboardFragment extends Fragment {
                 .addOnFailureListener(e -> {
                     if (!isAdded() || getContext() == null)
                         return;
-                    progressBar.setVisibility(View.GONE);
+                    if (progressBar != null) progressBar.setVisibility(View.GONE);
                     swipeRefresh.setRefreshing(false);
                 });
 
@@ -712,7 +714,7 @@ public class DashboardFragment extends Fragment {
                     public void onSuccess(List<RiceProduct> products) {
                         if (!isAdded() || getContext() == null)
                             return;
-                        progressBar.setVisibility(View.GONE);
+                        if (progressBar != null) progressBar.setVisibility(View.GONE);
                         swipeRefresh.setRefreshing(false);
 
                         double totalStockKg = 0;
@@ -755,7 +757,7 @@ public class DashboardFragment extends Fragment {
                     public void onFailure(String error) {
                         if (!isAdded() || getContext() == null)
                             return;
-                        progressBar.setVisibility(View.GONE);
+                        if (progressBar != null) progressBar.setVisibility(View.GONE);
                         swipeRefresh.setRefreshing(false);
                     }
                 });
@@ -772,7 +774,7 @@ public class DashboardFragment extends Fragment {
                 .addOnSuccessListener(querySnapshot -> {
                     if (!isAdded() || getContext() == null)
                         return;
-                    containerRecentTransactions.removeAllViews();
+                    
                     List<Transaction> txList = new ArrayList<>();
                     for (QueryDocumentSnapshot doc : querySnapshot) {
                         Transaction tx = doc.toObject(Transaction.class);
@@ -782,6 +784,7 @@ public class DashboardFragment extends Fragment {
 
                     txList.sort((t1, t2) -> Long.compare(t2.getDate(), t1.getDate()));
 
+                    containerRecentTransactions.removeAllViews();
                     if (txList.isEmpty()) {
                         containerRecentTransactions.addView(tvNoTransactions);
                     } else {
