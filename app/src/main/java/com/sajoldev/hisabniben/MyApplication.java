@@ -10,6 +10,7 @@ import androidx.annotation.Nullable;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
 import com.onesignal.OneSignal;
+import com.sajoldev.hisabniben.util.DisplayRefreshRateHelper;
 import com.sajoldev.hisabniben.util.ScreenSecurityHelper;
 
 public class MyApplication extends Application {
@@ -31,21 +32,23 @@ public class MyApplication extends Application {
         
         OneSignal.initWithContext(this, "b632ec59-9dfd-496f-ae50-5331bb53e91d");
 
-        // Allow screen sharing, screen recording, and screenshots across all activities without black screen or security hide warning
         registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks() {
             @Override
             public void onActivityCreated(@NonNull Activity activity, @Nullable Bundle savedInstanceState) {
                 ScreenSecurityHelper.allowScreenSharingAndRecording(activity);
+                DisplayRefreshRateHelper.enableHighRefreshRate(activity);
             }
 
             @Override
             public void onActivityStarted(@NonNull Activity activity) {
                 ScreenSecurityHelper.allowScreenSharingAndRecording(activity);
+                DisplayRefreshRateHelper.enableHighRefreshRate(activity);
             }
 
             @Override
             public void onActivityResumed(@NonNull Activity activity) {
                 ScreenSecurityHelper.allowScreenSharingAndRecording(activity);
+                DisplayRefreshRateHelper.enableHighRefreshRate(activity);
             }
 
             @Override
